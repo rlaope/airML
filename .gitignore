@@ -40,5 +40,5 @@ perf.data
 perf.data.old
 flamegraph.svg
 
-# Private notes (parent directory)
-../NOTES.md
+# Private notes (한글 문서 - git에 포함 안됨)
+/khope/

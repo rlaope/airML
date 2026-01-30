@@ -161,6 +161,10 @@ airML/
 
 MIT License - see [LICENSE](LICENSE) for details.
 
+## Maintainer
+
+- [@rlaope](https://github.com/rlaope) - piyrw9754@gmail.com
+
 ## Contributing
 
 See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for guidelines.
