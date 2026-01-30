@@ -1,0 +1,15 @@
+[package]
+name = "airml-providers"
+version = "0.1.0"
+edition = "2021"
+description = "Execution providers for airML"
+license = "MIT"
+
+[dependencies]
+ort = { workspace = true, features = ["load-dynamic"] }
+thiserror = { workspace = true }
+
+[features]
+default = ["cpu"]
+cpu = []
+coreml = ["ort/coreml"]

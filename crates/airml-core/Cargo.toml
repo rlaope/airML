@@ -1,0 +1,15 @@
+[package]
+name = "airml-core"
+version = "0.1.0"
+edition = "2021"
+description = "Core inference engine for airML"
+license = "MIT"
+
+[dependencies]
+ort = { workspace = true, features = ["load-dynamic"] }
+ndarray = { workspace = true }
+half = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+anyhow = { workspace = true }

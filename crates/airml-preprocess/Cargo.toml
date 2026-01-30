@@ -1,0 +1,18 @@
+[package]
+name = "airml-preprocess"
+version = "0.1.0"
+edition = "2021"
+description = "Preprocessing module for airML"
+license = "MIT"
+
+[dependencies]
+ndarray = { workspace = true }
+image = { workspace = true }
+thiserror = { workspace = true }
+
+# NLP (optional)
+tokenizers = { version = "0.21", optional = true }
+
+[features]
+default = []
+nlp = ["dep:tokenizers"]

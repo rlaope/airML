@@ -1,0 +1,10 @@
+[package]
+name = "airml-embed"
+version = "0.1.0"
+edition = "2021"
+description = "Model embedding support for airML"
+license = "MIT"
+
+[dependencies]
+airml-core = { path = "../airml-core" }
+thiserror = { workspace = true }

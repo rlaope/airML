@@ -1,0 +1,22 @@
+# Apple Silicon 빌드 최적화
+[target.aarch64-apple-darwin]
+rustflags = [
+    "-C", "target-cpu=native",
+    "-C", "link-arg=-undefined",
+    "-C", "link-arg=dynamic_lookup",
+]
+
+[target.x86_64-apple-darwin]
+rustflags = ["-C", "target-cpu=native"]
+
+# Linux
+[target.x86_64-unknown-linux-gnu]
+rustflags = ["-C", "target-cpu=native"]
+
+# 빌드 최적화
+[build]
+jobs = 8
+
+[env]
+# ORT 동적 라이브러리 경로 (필요시 설정)
+# ORT_DYLIB_PATH = "/path/to/libonnxruntime.dylib"
