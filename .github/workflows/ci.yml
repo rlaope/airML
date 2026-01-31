@@ -18,13 +18,13 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Rust
-        uses: dtolnay/rust-action@stable
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
 
       - name: Check
-        run: cargo check --all-features
+        run: cargo check --features nlp
 
   test:
     name: Test
@@ -38,13 +38,18 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Rust
-        uses: dtolnay/rust-action@${{ matrix.rust }}
+        uses: dtolnay/rust-toolchain@${{ matrix.rust }}
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
 
-      - name: Run tests
-        run: cargo test --all-features
+      - name: Run tests (Linux)
+        if: runner.os == 'Linux'
+        run: cargo test --features nlp
+
+      - name: Run tests (macOS)
+        if: runner.os == 'macOS'
+        run: cargo test --features coreml,nlp
 
   fmt:
     name: Format
@@ -53,7 +58,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Rust
-        uses: dtolnay/rust-action@stable
+        uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt
 
@@ -67,7 +72,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Rust
-        uses: dtolnay/rust-action@stable
+        uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
 
@@ -75,7 +80,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Clippy
-        run: cargo clippy --all-features -- -D warnings
+        run: cargo clippy --features nlp -- -D warnings
 
   build-macos:
     name: Build macOS
@@ -84,7 +89,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Rust
-        uses: dtolnay/rust-action@stable
+        uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-apple-darwin
 
@@ -92,10 +97,10 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Build (x86_64)
-        run: cargo build --release
+        run: cargo build --release --features coreml,nlp
 
       - name: Build (aarch64)
-        run: cargo build --release --target aarch64-apple-darwin
+        run: cargo build --release --target aarch64-apple-darwin --features coreml,nlp
         if: runner.arch == 'ARM64'
 
       - name: Check binary size
@@ -110,13 +115,13 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Rust
-        uses: dtolnay/rust-action@stable
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
 
       - name: Build
-        run: cargo build --release
+        run: cargo build --release --features nlp
 
       - name: Check binary size
         run: |
