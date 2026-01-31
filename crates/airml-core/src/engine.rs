@@ -192,6 +192,33 @@ impl InferenceEngine {
         self.run_named(vec![(&input_name, input)])
     }
 
+    /// Run inference with multiple input tensors (matched by order)
+    pub fn run_multiple(&mut self, inputs: Vec<ArrayD<f32>>) -> Result<Vec<ArrayD<f32>>> {
+        if inputs.len() != self.metadata.inputs.len() {
+            return Err(AirMLError::ConfigError(format!(
+                "Expected {} inputs, got {}",
+                self.metadata.inputs.len(),
+                inputs.len()
+            )));
+        }
+
+        // Collect input names first to avoid borrow conflict
+        let input_names: Vec<String> = self
+            .metadata
+            .inputs
+            .iter()
+            .map(|info| info.name.clone())
+            .collect();
+
+        let named_inputs: Vec<(&str, ArrayD<f32>)> = input_names
+            .iter()
+            .zip(inputs.into_iter())
+            .map(|(name, arr)| (name.as_str(), arr))
+            .collect();
+
+        self.run_named(named_inputs)
+    }
+
     /// Run inference with named inputs
     pub fn run_named(&mut self, inputs: Vec<(&str, ArrayD<f32>)>) -> Result<Vec<ArrayD<f32>>> {
         // Create input tensors

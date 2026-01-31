@@ -25,5 +25,7 @@ fn main() -> Result<()> {
         Commands::Info(args) => commands::info(args),
         Commands::Bench(args) => commands::bench(args),
         Commands::System => commands::system(),
+        #[cfg(feature = "nlp")]
+        Commands::Embed(args) => commands::embed(args, cli.verbose),
     }
 }
