@@ -76,6 +76,7 @@ impl ImagePreprocessor {
 
     /// Create a preprocessor with CLIP normalization settings
     /// Input: 224x224, RGB, normalized with CLIP mean/std
+    #[allow(clippy::excessive_precision)]
     pub fn clip() -> Self {
         Self {
             width: 224,
