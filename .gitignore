@@ -42,3 +42,7 @@ flamegraph.svg
 
 # Private notes (한글 문서 - git에 포함 안됨)
 /khope/
+
+# ONNX Runtime (downloaded for testing)
+/onnxruntime-*/
+2
