@@ -13,26 +13,53 @@ A lightweight ML runtime that runs ONNX models without Python. Fast, portable, a
 
 ## Installation
 
+### macOS (Apple Silicon) - Recommended
+
+```bash
+# 1. Download airml
+curl -L https://github.com/rlaope/airML/releases/latest/download/airml-macos-aarch64.tar.gz | tar xz
+sudo mv airml /usr/local/bin/
+
+# 2. Download ONNX Runtime (required)
+curl -L https://github.com/microsoft/onnxruntime/releases/download/v1.23.1/onnxruntime-osx-arm64-1.23.1.tgz | tar xz -C /usr/local/lib
+
+# 3. Set environment variable (add to ~/.zshrc for persistence)
+export ORT_DYLIB_PATH=/usr/local/lib/onnxruntime-osx-arm64-1.23.1/lib/libonnxruntime.dylib
+```
+
+### macOS (Intel)
+
+```bash
+curl -L https://github.com/rlaope/airML/releases/latest/download/airml-macos-x86_64.tar.gz | tar xz
+sudo mv airml /usr/local/bin/
+
+curl -L https://github.com/microsoft/onnxruntime/releases/download/v1.23.1/onnxruntime-osx-x86_64-1.23.1.tgz | tar xz -C /usr/local/lib
+export ORT_DYLIB_PATH=/usr/local/lib/onnxruntime-osx-x86_64-1.23.1/lib/libonnxruntime.dylib
+```
+
+### Linux (x86_64)
+
+```bash
+curl -L https://github.com/rlaope/airML/releases/latest/download/airml-linux-x86_64.tar.gz | tar xz
+sudo mv airml /usr/local/bin/
+
+curl -L https://github.com/microsoft/onnxruntime/releases/download/v1.23.1/onnxruntime-linux-x64-1.23.1.tgz | tar xz -C /usr/local/lib
+export ORT_DYLIB_PATH=/usr/local/lib/onnxruntime-linux-x64-1.23.1/lib/libonnxruntime.so
+```
+
 ### From Source
 
 ```bash
-# Clone the repository
-git clone https://github.com/airml/airml.git
-cd airml
-
-# Build release binary (CPU only)
-cargo build --release
-
-# Build with all features (macOS)
+git clone https://github.com/rlaope/airML.git
+cd airML
 cargo build --release --features coreml,nlp
-
-# Optional: Install to PATH
-cargo install --path .
 ```
 
-### Pre-built Binaries
+### Verify Installation
 
-Download from [Releases](https://github.com/airml/airml/releases).
+```bash
+airml system
+```
 
 ## Quick Start
 
