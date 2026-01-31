@@ -11,7 +11,7 @@ pub use cpu::CpuProvider;
 pub use ort::execution_providers::ExecutionProviderDispatch;
 
 #[cfg(feature = "coreml")]
-pub use coreml::{CoreMLConfig, CoreMLProvider};
+pub use coreml::{ComputeUnits, CoreMLConfig, CoreMLModelFormat, CoreMLProvider};
 
 /// Available execution providers
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

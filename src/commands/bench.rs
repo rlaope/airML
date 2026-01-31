@@ -22,6 +22,10 @@ pub fn execute(args: &BenchArgs) -> Result<()> {
         "cpu" => vec![airml_providers::CpuProvider::default().into_dispatch()],
         #[cfg(feature = "coreml")]
         "coreml" => vec![airml_providers::CoreMLProvider::default().into_dispatch()],
+        #[cfg(feature = "coreml")]
+        "neural-engine" => vec![airml_providers::CoreMLProvider::default()
+            .neural_engine_only()
+            .into_dispatch()],
         _ => auto_select_providers(),
     };
 

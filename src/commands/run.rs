@@ -72,9 +72,13 @@ fn select_providers(provider_name: &str) -> Result<Vec<airml_providers::Executio
         "auto" => Ok(auto_select_providers()),
         "cpu" => Ok(vec![airml_providers::CpuProvider::default().into_dispatch()]),
         #[cfg(feature = "coreml")]
-        "coreml" | "neural-engine" => {
-            Ok(vec![airml_providers::CoreMLProvider::default().into_dispatch()])
-        }
+        "coreml" => Ok(vec![airml_providers::CoreMLProvider::default().into_dispatch()]),
+        #[cfg(feature = "coreml")]
+        "neural-engine" => Ok(vec![
+            airml_providers::CoreMLProvider::default()
+                .neural_engine_only()
+                .into_dispatch(),
+        ]),
         _ => {
             println!("Warning: Unknown provider '{}', using auto-selection", provider_name);
             Ok(auto_select_providers())
