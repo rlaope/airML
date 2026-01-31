@@ -10,6 +10,6 @@ mod text;
 pub use image::{ImagePreprocessor, ResizeMode};
 
 #[cfg(feature = "nlp")]
-pub use text::TextPreprocessor;
+pub use text::{TextPreprocessor, TextPreprocessError, TokenizedInput};
 
 pub use ndarray;
