@@ -212,7 +212,7 @@ impl InferenceEngine {
 
         let named_inputs: Vec<(&str, ArrayD<f32>)> = input_names
             .iter()
-            .zip(inputs.into_iter())
+            .zip(inputs)
             .map(|(name, arr)| (name.as_str(), arr))
             .collect();
 
@@ -257,7 +257,7 @@ impl InferenceEngine {
                 .map_err(|e: ort::Error| AirMLError::InferenceError(e.to_string()))?;
 
             let shape_vec: Vec<usize> = shape.iter().map(|&d| d as usize).collect();
-            let data_vec: Vec<f32> = data.iter().copied().collect();
+            let data_vec: Vec<f32> = data.to_vec();
             let array = ArrayD::from_shape_vec(IxDyn(&shape_vec), data_vec)
                 .map_err(|e| AirMLError::InferenceError(e.to_string()))?;
 
