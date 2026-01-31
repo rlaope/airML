@@ -36,6 +36,7 @@ pub fn is_apple_silicon() -> bool {
 }
 
 /// Auto-select the best available execution provider
+#[allow(clippy::vec_init_then_push)]
 pub fn auto_select_providers() -> Vec<ExecutionProviderDispatch> {
     let mut providers = Vec::new();
 

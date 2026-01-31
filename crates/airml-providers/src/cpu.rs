@@ -25,6 +25,6 @@ impl CpuProvider {
 
     /// Convert to ORT execution provider dispatch
     pub fn into_dispatch(self) -> ExecutionProviderDispatch {
-        CPUExecutionProvider::default().build().into()
+        CPUExecutionProvider::default().build()
     }
 }
