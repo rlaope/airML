@@ -45,4 +45,3 @@ flamegraph.svg
 
 # ONNX Runtime (downloaded for testing)
 /onnxruntime-*/
-2
