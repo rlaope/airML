@@ -107,7 +107,7 @@ anyhow = "1.0"
 # HTTP / IO / hashing (shared by hub + install)
 ureq = { version = "2.10", features = ["tls"] }
 sha2 = "0.10"
-dirs = "5.0"
+dirs = "6.0"
 hex = "0.4"
 
 # Benchmarks
