@@ -121,14 +121,14 @@ jobs:
 
       # ── Upload site as artifact ───────────────────────────────────────────
       - name: Upload benchmark site artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: bench-site-${{ github.sha }}
           path: bench/site/dist/
           retention-days: 30
 
       - name: Upload raw results artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: bench-results-${{ github.sha }}
           path: bench/results/
