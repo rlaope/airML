@@ -111,7 +111,7 @@ dirs = "5.0"
 hex = "0.4"
 
 # Benchmarks
-criterion = { version = "0.5", features = ["html_reports"] }
+criterion = { version = "0.8", features = ["html_reports"] }
 
 # Internal core (used by downstream crates that need engine APIs)
 airml-core = { path = "crates/airml-core", version = "0.1.0" }
