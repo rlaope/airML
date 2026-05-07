@@ -1,0 +1,1973 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>airML</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="Run any ONNX model on Apple Silicon as a single binary">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "ayu" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item affix "><a href="index.html">Introduction</a></li><li class="chapter-item affix "><li class="part-title">Getting Started</li><li class="chapter-item "><a href="getting-started/quickstart.html">Quickstart</a></li><li class="chapter-item "><a href="getting-started/installation.html">Installation</a></li><li class="chapter-item "><a href="getting-started/first-inference.html">Your first inference</a></li><li class="chapter-item affix "><li class="part-title">CLI Reference</li><li class="chapter-item "><a href="cli/overview.html">Overview</a></li><li class="chapter-item "><a href="cli/run.html">airml run</a></li><li class="chapter-item "><a href="cli/embed.html">airml embed</a></li><li class="chapter-item "><a href="cli/info.html">airml info</a></li><li class="chapter-item "><a href="cli/bench.html">airml bench</a></li><li class="chapter-item "><a href="cli/install-runtime.html">airml install-runtime</a></li><li class="chapter-item "><a href="cli/pull.html">airml pull</a></li><li class="chapter-item "><a href="cli/generate.html">airml generate</a></li><li class="chapter-item "><a href="cli/serve.html">airml serve</a></li><li class="chapter-item "><a href="cli/system.html">airml system</a></li><li class="chapter-item affix "><li class="part-title">Library API</li><li class="chapter-item "><a href="crates/airml-core.html">airml-core</a></li><li class="chapter-item "><a href="crates/airml-providers.html">airml-providers</a></li><li class="chapter-item "><a href="crates/airml-tune.html">airml-tune</a></li><li class="chapter-item "><a href="crates/airml-hub.html">airml-hub</a></li><li class="chapter-item "><a href="crates/airml-embed.html">airml-embed</a></li><li class="chapter-item "><a href="crates/airml-bench.html">airml-bench</a></li><li class="chapter-item "><a href="crates/airml-preprocess.html">airml-preprocess</a></li><li class="chapter-item affix "><li class="part-title">Apple Silicon</li><li class="chapter-item "><a href="apple-silicon/auto-tuner.html">Auto-tuner overview</a></li><li class="chapter-item "><a href="apple-silicon/compute-units.html">Compute units guide</a></li><li class="chapter-item "><a href="apple-silicon/model-formats.html">CoreML model formats</a></li><li class="chapter-item affix "><li class="part-title">Architecture</li><li class="chapter-item "><a href="architecture/overview.html">Overview</a></li><li class="chapter-item "><a href="architecture/workspace.html">Workspace topology</a></li><li class="chapter-item "><a href="architecture/inference-flow.html">Inference flow</a></li><li class="chapter-item "><a href="architecture/auto-tuner.html">Auto-tuner internals</a></li><li class="chapter-item "><a href="architecture/hub.html">Hub & cache</a></li><li class="chapter-item affix "><li class="part-title">Deployment</li><li class="chapter-item "><a href="deployment/overview.html">Deployment overview</a></li><li class="chapter-item "><a href="deployment/docker.html">Docker</a></li><li class="chapter-item "><a href="deployment/systemd.html">systemd</a></li><li class="chapter-item "><a href="deployment/lambda.html">AWS Lambda</a></li><li class="chapter-item "><a href="deployment/homebrew.html">Homebrew</a></li><li class="chapter-item affix "><li class="part-title">Operations</li><li class="chapter-item "><a href="operations/observability.html">Observability</a></li><li class="chapter-item "><a href="operations/stability.html">Stability</a></li><li class="chapter-item "><a href="operations/performance.html">Performance</a></li><li class="chapter-item affix "><li class="part-title">Contributing</li><li class="chapter-item "><a href="contributing.html">How to contribute</a></li><li class="chapter-item "><a href="roadmap.html">Roadmap</a></li><li class="chapter-item "><a href="releasing.html">Releasing</a></li><li class="chapter-item "><a href="changelog.html">Changelog</a></li><li class="chapter-item affix "><li class="part-title">Reference</li><li class="chapter-item "><a href="reference/anti-goals.html">Anti-goals</a></li><li class="chapter-item "><a href="reference/glossary.html">Glossary</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">airML</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/rlaope/airML" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="airml"><a class="header" href="#airml">airML</a></h1>
+<blockquote>
+<p>The fastest way to run any ONNX model on Apple Silicon as a single binary.
+No Python, no Docker, no <code>pip install</code>.</p>
+</blockquote>
+<p>airML packages ONNX Runtime and a curated set of models into a single native binary. You get sub-50ms cold starts, automatic Apple Neural Engine dispatch, and zero runtime dependencies. Install once, ship anywhere.</p>
+<p><a href="https://github.com/airml/airml/actions/workflows/ci.yml"><img src="https://github.com/airml/airml/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+<a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" /></a>
+<a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/Rust-1.75%2B-orange.svg" alt="Rust 1.75+" /></a>
+<a href=""><img src="https://img.shields.io/badge/platform-macOS%20arm64-lightgrey.svg" alt="macOS arm64" /></a>
+<a href=""><img src="https://img.shields.io/badge/platform-Linux%20arm64%20%2F%20x86__64-lightgrey.svg" alt="Linux arm64 / x86_64" /></a></p>
+<h2 id="why-airml"><a class="header" href="#why-airml">Why airML</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>You want to...</th><th style="text-align: center">airML</th><th style="text-align: center">candle</th><th style="text-align: center">ort</th><th style="text-align: center">tract</th></tr></thead><tbody>
+<tr><td>Ship a 50MB binary that runs ONNX</td><td style="text-align: center">yes</td><td style="text-align: center">no</td><td style="text-align: center">no</td><td style="text-align: center">yes</td></tr>
+<tr><td>Use Apple Neural Engine without writing CoreML</td><td style="text-align: center">yes</td><td style="text-align: center">no</td><td style="text-align: center">manual</td><td style="text-align: center">no</td></tr>
+<tr><td>Auto-pick the best compute units per model</td><td style="text-align: center">yes (<code>airml-tune</code>)</td><td style="text-align: center">no</td><td style="text-align: center">no</td><td style="text-align: center">no</td></tr>
+<tr><td>Skip Python entirely</td><td style="text-align: center">yes</td><td style="text-align: center">yes</td><td style="text-align: center">yes (Rust)</td><td style="text-align: center">yes</td></tr>
+<tr><td>Train models</td><td style="text-align: center">no</td><td style="text-align: center">yes</td><td style="text-align: center">no</td><td style="text-align: center">no</td></tr>
+<tr><td>GPU on NVIDIA</td><td style="text-align: center">use <code>candle</code></td><td style="text-align: center">yes</td><td style="text-align: center">yes</td><td style="text-align: center">no</td></tr>
+</tbody></table>
+</div>
+<h2 id="whats-in-this-book"><a class="header" href="#whats-in-this-book">What's in this book</a></h2>
+<ul>
+<li><strong>Getting Started</strong> — install, run your first inference in 60 seconds.</li>
+<li><strong>CLI Reference</strong> — every command, every flag.</li>
+<li><strong>Library API</strong> — embed airML in your own Rust application.</li>
+<li><strong>Apple Silicon</strong> — auto-tuner internals, compute unit selection.</li>
+<li><strong>Deployment</strong> — Docker, systemd, Lambda, Homebrew.</li>
+<li><strong>Operations</strong> — logging, metrics, stability guarantees.</li>
+<li><strong>Contributing</strong> — roadmap, release process, changelog.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="quickstart"><a class="header" href="#quickstart">Quickstart</a></h1>
+<p>Get from zero to a working inference in under 60 seconds.</p>
+<h2 id="prerequisites"><a class="header" href="#prerequisites">Prerequisites</a></h2>
+<ul>
+<li>macOS (Apple Silicon or Intel) or Linux (arm64 / x86_64)</li>
+<li>Rust 1.75+ (<code>rustup</code> recommended)</li>
+</ul>
+<h2 id="install"><a class="header" href="#install">Install</a></h2>
+<pre><code class="language-bash"># From crates.io (once published)
+cargo install airml
+
+# Or directly from GitHub
+cargo install --git https://github.com/rlaope/airML
+</code></pre>
+<h2 id="install-onnx-runtime"><a class="header" href="#install-onnx-runtime">Install ONNX Runtime</a></h2>
+<p>airML needs the ONNX Runtime shared library. One command handles it:</p>
+<pre><code class="language-bash">airml install-runtime
+</code></pre>
+<p>This downloads the correct pre-built dylib for your platform and prints the path to set <code>ORT_DYLIB_PATH</code>. Add that export to your shell profile.</p>
+<h2 id="pull-a-model-and-run-inference"><a class="header" href="#pull-a-model-and-run-inference">Pull a model and run inference</a></h2>
+<pre><code class="language-bash"># Pull a small text-embedding model (~133 MB)
+airml pull bge-small-en
+
+# Run inference
+airml run -m bge-small-en --input "Hello, world."
+</code></pre>
+<h2 id="verify-the-platform"><a class="header" href="#verify-the-platform">Verify the platform</a></h2>
+<pre><code class="language-bash">airml system
+</code></pre>
+<p>This reports your OS, CPU architecture, Apple Silicon detection, and which execution providers (CPU, CoreML, Neural Engine) are available.</p>
+<h2 id="next-steps"><a class="header" href="#next-steps">Next steps</a></h2>
+<ul>
+<li><a href="getting-started/installation.html">Installation</a> — all install methods including pre-built binaries</li>
+<li><a href="getting-started/first-inference.html">Your first inference</a> — image classification walkthrough</li>
+<li><a href="getting-started/../cli/overview.html">CLI Reference</a> — all commands and flags</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="installation"><a class="header" href="#installation">Installation</a></h1>
+<h2 id="macos-apple-silicon--recommended"><a class="header" href="#macos-apple-silicon--recommended">macOS (Apple Silicon) — recommended</a></h2>
+<pre><code class="language-bash"># 1. Download the pre-built binary
+curl -L https://github.com/rlaope/airML/releases/latest/download/airml-macos-aarch64.tar.gz | tar xz
+sudo mv airml /usr/local/bin/
+
+# 2. Install ONNX Runtime (preferred)
+airml install-runtime
+
+# Or install manually:
+curl -L https://github.com/microsoft/onnxruntime/releases/download/v1.23.1/onnxruntime-osx-arm64-1.23.1.tgz \
+  | tar xz -C /usr/local/lib
+export ORT_DYLIB_PATH=/usr/local/lib/onnxruntime-osx-arm64-1.23.1/lib/libonnxruntime.dylib
+</code></pre>
+<h2 id="macos-intel"><a class="header" href="#macos-intel">macOS (Intel)</a></h2>
+<pre><code class="language-bash">curl -L https://github.com/rlaope/airML/releases/latest/download/airml-macos-x86_64.tar.gz | tar xz
+sudo mv airml /usr/local/bin/
+
+curl -L https://github.com/microsoft/onnxruntime/releases/download/v1.23.1/onnxruntime-osx-x86_64-1.23.1.tgz \
+  | tar xz -C /usr/local/lib
+export ORT_DYLIB_PATH=/usr/local/lib/onnxruntime-osx-x86_64-1.23.1/lib/libonnxruntime.dylib
+</code></pre>
+<h2 id="linux-x86_64"><a class="header" href="#linux-x86_64">Linux (x86_64)</a></h2>
+<pre><code class="language-bash">curl -L https://github.com/rlaope/airML/releases/latest/download/airml-linux-x86_64.tar.gz | tar xz
+sudo mv airml /usr/local/bin/
+
+curl -L https://github.com/microsoft/onnxruntime/releases/download/v1.23.1/onnxruntime-linux-x64-1.23.1.tgz \
+  | tar xz -C /usr/local/lib
+export ORT_DYLIB_PATH=/usr/local/lib/onnxruntime-linux-x64-1.23.1/lib/libonnxruntime.so
+</code></pre>
+<h2 id="from-source"><a class="header" href="#from-source">From source</a></h2>
+<pre><code class="language-bash">git clone https://github.com/rlaope/airML.git
+cd airML
+cargo build --release --features coreml,nlp
+</code></pre>
+<p>The compiled binary will be at <code>target/release/airml</code>.</p>
+<h2 id="homebrew-coming-soon"><a class="header" href="#homebrew-coming-soon">Homebrew (coming soon)</a></h2>
+<pre><code class="language-bash">brew tap airml/airml https://github.com/airml/homebrew-airml
+brew install airml
+airml install-runtime   # ORT is not bundled in the bottle
+</code></pre>
+<p>See <a href="getting-started/../deployment/homebrew.html">Homebrew deployment</a> for details on the tap status.</p>
+<h2 id="verify-installation"><a class="header" href="#verify-installation">Verify installation</a></h2>
+<pre><code class="language-bash">airml system
+</code></pre>
+<p>Expected output on Apple Silicon:</p>
+<pre><code>OS: macOS 14.x
+Arch: aarch64
+Apple Silicon: true
+Providers: CPU, CoreML, NeuralEngine
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="your-first-inference"><a class="header" href="#your-first-inference">Your first inference</a></h1>
+<p>This walkthrough classifies an image using MobileNetV3-Small — a 14 MB model that runs on the Neural Engine.</p>
+<h2 id="1-pull-the-model"><a class="header" href="#1-pull-the-model">1. Pull the model</a></h2>
+<pre><code class="language-bash">airml pull mobilenetv3-small
+</code></pre>
+<p>Output:</p>
+<pre><code>Pulling mobilenetv3-small from registry...
+  SHA256 verified
+  Cached to ~/.cache/airml/mobilenetv3-small.onnx
+</code></pre>
+<h2 id="2-download-a-test-image"><a class="header" href="#2-download-a-test-image">2. Download a test image</a></h2>
+<pre><code class="language-bash">curl -o cat.jpg https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Cat_November_2010-1a.jpg/320px-Cat_November_2010-1a.jpg
+</code></pre>
+<h2 id="3-run-inference"><a class="header" href="#3-run-inference">3. Run inference</a></h2>
+<pre><code class="language-bash">airml run -m mobilenetv3-small -i cat.jpg --top-k 3
+</code></pre>
+<p>Expected output:</p>
+<pre><code>Top 3 predictions:
+  1. tabby cat           0.612
+  2. tiger cat           0.218
+  3. Egyptian cat        0.091
+Inference time: 12ms  Provider: NeuralEngine
+</code></pre>
+<h2 id="4-inspect-the-model"><a class="header" href="#4-inspect-the-model">4. Inspect the model</a></h2>
+<pre><code class="language-bash">airml info -m mobilenetv3-small
+</code></pre>
+<pre><code>Model: mobilenetv3-small
+Inputs:
+  input  [1, 3, 224, 224]  float32
+Outputs:
+  output [1, 1000]         float32
+Producer: pytorch
+</code></pre>
+<h2 id="5-benchmark-latency"><a class="header" href="#5-benchmark-latency">5. Benchmark latency</a></h2>
+<pre><code class="language-bash">airml bench -m mobilenetv3-small -n 200 -w 20
+</code></pre>
+<pre><code>Provider: NeuralEngine
+Iterations: 200  Warmup: 20
+  P50:  11.2ms
+  P95:  13.8ms
+  P99:  15.1ms
+</code></pre>
+<h2 id="using-a-huggingface-model"><a class="header" href="#using-a-huggingface-model">Using a HuggingFace model</a></h2>
+<p>airML can pull directly from HuggingFace with the <code>hf://</code> URI:</p>
+<pre><code class="language-bash">airml run -m hf://Xenova/clip-vit-base-patch32 -i cat.jpg --preprocess clip
+</code></pre>
+<h2 id="next-steps-1"><a class="header" href="#next-steps-1">Next steps</a></h2>
+<ul>
+<li><a href="getting-started/../cli/run.html">airml run reference</a> — all flags</li>
+<li><a href="getting-started/../apple-silicon/auto-tuner.html">Auto-tuner overview</a> — how provider selection works</li>
+<li><a href="getting-started/../crates/airml-core.html">Library API</a> — embed airML in your Rust app</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="cli-reference"><a class="header" href="#cli-reference">CLI Reference</a></h1>
+<p>airML is a single binary with subcommands for inference, model management, benchmarking, and serving.</p>
+<h2 id="global-flags"><a class="header" href="#global-flags">Global flags</a></h2>
+<p>These flags apply before any subcommand:</p>
+<div class="table-wrapper"><table><thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>--log-format &lt;FORMAT&gt;</code></td><td><code>text</code></td><td><code>text</code> (human-readable) or <code>json</code> (structured)</td></tr>
+<tr><td><code>--log-level &lt;LEVEL&gt;</code></td><td><code>info</code></td><td><code>trace</code>, <code>debug</code>, <code>info</code>, <code>warn</code>, or <code>error</code></td></tr>
+<tr><td><code>--cache-dir &lt;PATH&gt;</code></td><td><code>~/.cache/airml</code></td><td>Override the model cache directory</td></tr>
+</tbody></table>
+</div>
+<p><code>RUST_LOG</code> takes precedence over <code>--log-level</code>. Example:</p>
+<pre><code class="language-bash">RUST_LOG=airml_core=debug,airml_hub=info airml run -m bge-small-en --input "hi"
+</code></pre>
+<h2 id="commands"><a class="header" href="#commands">Commands</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Command</th><th>Purpose</th></tr></thead><tbody>
+<tr><td><a href="cli/run.html"><code>airml run</code></a></td><td>Run inference on an input</td></tr>
+<tr><td><a href="cli/embed.html"><code>airml embed</code></a></td><td>Generate text embeddings</td></tr>
+<tr><td><a href="cli/info.html"><code>airml info</code></a></td><td>Inspect model metadata</td></tr>
+<tr><td><a href="cli/bench.html"><code>airml bench</code></a></td><td>Measure inference latency</td></tr>
+<tr><td><a href="cli/install-runtime.html"><code>airml install-runtime</code></a></td><td>Auto-download ONNX Runtime dylib</td></tr>
+<tr><td><a href="cli/pull.html"><code>airml pull</code></a></td><td>Cache a model from registry, HuggingFace, or URL</td></tr>
+<tr><td><a href="cli/generate.html"><code>airml generate</code></a></td><td>LLM text generation (stub, v0.3)</td></tr>
+<tr><td><a href="cli/serve.html"><code>airml serve</code></a></td><td>OpenAI-compatible embeddings HTTP server</td></tr>
+<tr><td><a href="cli/system.html"><code>airml system</code></a></td><td>Print platform and provider info</td></tr>
+</tbody></table>
+</div>
+<h2 id="provider-selection"><a class="header" href="#provider-selection">Provider selection</a></h2>
+<p>All inference commands accept <code>--provider</code>:</p>
+<div class="table-wrapper"><table><thead><tr><th>Value</th><th>Hardware</th></tr></thead><tbody>
+<tr><td><code>auto</code></td><td>Let <code>BackendOracle</code> choose (default)</td></tr>
+<tr><td><code>cpu</code></td><td>CPU only</td></tr>
+<tr><td><code>coreml</code></td><td>CoreML with all compute units</td></tr>
+<tr><td><code>neural-engine</code></td><td>CoreML restricted to ANE + CPU</td></tr>
+</tbody></table>
+</div>
+<p>On non-Apple platforms, <code>coreml</code> and <code>neural-engine</code> fall back to CPU.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="airml-run"><a class="header" href="#airml-run"><code>airml run</code></a></h1>
+<p>Run inference on a single input file. The default pipeline is image classification: preprocess the image, run the ONNX model, apply softmax, and print the top-K labels.</p>
+<h2 id="usage"><a class="header" href="#usage">Usage</a></h2>
+<pre><code>airml run --model &lt;PATH-OR-URI&gt; --input &lt;FILE&gt; [OPTIONS]
+</code></pre>
+<h2 id="options"><a class="header" href="#options">Options</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>-m, --model &lt;URI&gt;</code></td><td>(required)</td><td>ONNX model path, registry id, or <code>hf://owner/repo[/file]</code> URI</td></tr>
+<tr><td><code>-i, --input &lt;FILE&gt;</code></td><td>(required)</td><td>Input image file</td></tr>
+<tr><td><code>-l, --labels &lt;FILE&gt;</code></td><td>none</td><td>Optional labels file (one label per line)</td></tr>
+<tr><td><code>-k, --top-k &lt;N&gt;</code></td><td><code>5</code></td><td>Number of top predictions to display</td></tr>
+<tr><td><code>-p, --provider &lt;P&gt;</code></td><td><code>auto</code></td><td><code>cpu</code>, <code>coreml</code>, <code>neural-engine</code>, or <code>auto</code></td></tr>
+<tr><td><code>--preprocess &lt;PRESET&gt;</code></td><td><code>imagenet</code></td><td><code>imagenet</code>, <code>clip</code>, <code>yolo</code>, or <code>none</code></td></tr>
+<tr><td><code>--raw</code></td><td>off</td><td>Print raw tensor values instead of softmax classification</td></tr>
+<tr><td><code>-v, --verbose</code></td><td>off</td><td>Show timing and provider details</td></tr>
+</tbody></table>
+</div>
+<h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
+<pre><code class="language-bash"># Classify an image with auto-selected provider
+airml run -m mobilenetv3-small -i cat.jpg
+
+# Force Neural Engine only
+airml run -m mobilenetv3-small -i cat.jpg --provider neural-engine
+
+# Use a HuggingFace model with CLIP preprocessing
+airml run -m hf://Xenova/clip-vit-base-patch32 -i photo.jpg --preprocess clip
+
+# Show top 10 predictions with raw scores
+airml run -m mobilenetv3-small -i cat.jpg --top-k 10 --raw
+
+# Use a local ONNX file with a labels file
+airml run -m ./models/resnet50.onnx -i dog.jpg -l imagenet_labels.txt
+</code></pre>
+<h2 id="preprocessing-presets"><a class="header" href="#preprocessing-presets">Preprocessing presets</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Preset</th><th>Size</th><th>Mean</th><th>Std</th><th>Notes</th></tr></thead><tbody>
+<tr><td><code>imagenet</code></td><td>224×224</td><td>[0.485, 0.456, 0.406]</td><td>[0.229, 0.224, 0.225]</td><td>Standard ImageNet normalization</td></tr>
+<tr><td><code>clip</code></td><td>224×224</td><td>[0.481, 0.457, 0.408]</td><td>[0.268, 0.261, 0.275]</td><td>OpenAI CLIP normalization</td></tr>
+<tr><td><code>yolo</code></td><td>640×640</td><td>none</td><td>none</td><td>Letterbox, no normalization</td></tr>
+<tr><td><code>none</code></td><td>(unchanged)</td><td>none</td><td>none</td><td>Pass image bytes as-is</td></tr>
+</tbody></table>
+</div>
+<h2 id="see-also"><a class="header" href="#see-also">See also</a></h2>
+<ul>
+<li><a href="cli/info.html"><code>airml info</code></a> — inspect model metadata before running</li>
+<li><a href="cli/bench.html"><code>airml bench</code></a> — measure inference latency</li>
+<li><a href="cli/../apple-silicon/auto-tuner.html">Auto-tuner overview</a> — how <code>--provider auto</code> works</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="airml-embed"><a class="header" href="#airml-embed"><code>airml embed</code></a></h1>
+<p>Generate a text embedding vector from an ONNX encoder model. Requires the <code>nlp</code> feature at build time (<code>cargo build --features nlp</code>).</p>
+<h2 id="usage-1"><a class="header" href="#usage-1">Usage</a></h2>
+<pre><code>airml embed --model &lt;PATH&gt; --tokenizer &lt;PATH&gt; --text &lt;TEXT&gt; [OPTIONS]
+</code></pre>
+<h2 id="options-1"><a class="header" href="#options-1">Options</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>-m, --model &lt;PATH&gt;</code></td><td>(required)</td><td>ONNX embedding model path or registry id</td></tr>
+<tr><td><code>-t, --tokenizer &lt;PATH&gt;</code></td><td>(required)</td><td>Path to <code>tokenizer.json</code></td></tr>
+<tr><td><code>--text &lt;TEXT&gt;</code></td><td>(required)</td><td>Text string to embed</td></tr>
+<tr><td><code>--max-length &lt;N&gt;</code></td><td><code>512</code></td><td>Maximum token sequence length</td></tr>
+<tr><td><code>-p, --provider &lt;P&gt;</code></td><td><code>auto</code></td><td>Execution provider</td></tr>
+<tr><td><code>--output &lt;FORMAT&gt;</code></td><td><code>json</code></td><td><code>json</code> or <code>raw</code> (space-separated floats)</td></tr>
+<tr><td><code>--normalize</code></td><td>off</td><td>L2-normalize the output embedding</td></tr>
+<tr><td><code>--cache-dir &lt;PATH&gt;</code></td><td><code>~/.cache/airml</code></td><td>Override cache directory</td></tr>
+<tr><td><code>-v, --verbose</code></td><td>off</td><td>Show timing and provider details</td></tr>
+</tbody></table>
+</div>
+<h2 id="examples-1"><a class="header" href="#examples-1">Examples</a></h2>
+<pre><code class="language-bash"># Embed a sentence and output JSON
+airml embed -m bge-small-en -t tokenizer.json --text "Hello, world."
+
+# Output raw floats for piping
+airml embed -m bge-small-en -t tokenizer.json --text "Hello" --output raw
+
+# L2-normalize for cosine similarity
+airml embed -m bge-small-en -t tokenizer.json --text "cats" --normalize
+</code></pre>
+<h2 id="output-format"><a class="header" href="#output-format">Output format</a></h2>
+<p>JSON output (default):</p>
+<pre><code class="language-json">{
+  "embedding": [0.012, -0.034, 0.091, ...],
+  "dimensions": 384,
+  "model": "bge-small-en",
+  "provider": "NeuralEngine",
+  "latency_ms": 18.4
+}
+</code></pre>
+<h2 id="using-the-http-api-instead"><a class="header" href="#using-the-http-api-instead">Using the HTTP API instead</a></h2>
+<p>For batch embedding or production use, prefer <a href="cli/serve.html"><code>airml serve</code></a> — it exposes an OpenAI-compatible <code>/v1/embeddings</code> endpoint.</p>
+<h2 id="see-also-1"><a class="header" href="#see-also-1">See also</a></h2>
+<ul>
+<li><a href="cli/serve.html"><code>airml serve</code></a> — HTTP embeddings server</li>
+<li><a href="cli/../crates/airml-preprocess.html">airml-preprocess</a> — tokenizer internals</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="airml-info"><a class="header" href="#airml-info"><code>airml info</code></a></h1>
+<p>Inspect an ONNX model: inputs, outputs, tensor shapes, data types, and producer metadata — without running inference.</p>
+<h2 id="usage-2"><a class="header" href="#usage-2">Usage</a></h2>
+<pre><code>airml info --model &lt;PATH-OR-URI&gt; [OPTIONS]
+</code></pre>
+<h2 id="options-2"><a class="header" href="#options-2">Options</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>-m, --model &lt;PATH&gt;</code></td><td>(required)</td><td>ONNX model path or registry id</td></tr>
+<tr><td><code>-v, --verbose</code></td><td>off</td><td>Show all metadata fields including custom properties</td></tr>
+</tbody></table>
+</div>
+<h2 id="example"><a class="header" href="#example">Example</a></h2>
+<pre><code class="language-bash">airml info -m mobilenetv3-small
+</code></pre>
+<pre><code>Model: mobilenetv3-small
+Producer: pytorch  version: 2.1.0
+IR version: 8
+
+Inputs:
+  input   shape=[1, 3, 224, 224]  dtype=float32
+
+Outputs:
+  output  shape=[1, 1000]         dtype=float32
+
+File size: 14.2 MB
+</code></pre>
+<p>With <code>--verbose</code>:</p>
+<pre><code class="language-bash">airml info -m mobilenetv3-small --verbose
+</code></pre>
+<pre><code>... (above) ...
+
+Custom metadata:
+  task: image_classification
+  dataset: imagenet
+  accuracy_top1: 0.756
+</code></pre>
+<h2 id="use-before-airml-run"><a class="header" href="#use-before-airml-run">Use before <code>airml run</code></a></h2>
+<p>Use <code>airml info</code> to verify input shapes and choose the right <code>--preprocess</code> preset before running inference. If the input shape is <code>[1, 3, 224, 224]</code>, <code>imagenet</code> or <code>clip</code> preprocessing is appropriate.</p>
+<h2 id="see-also-2"><a class="header" href="#see-also-2">See also</a></h2>
+<ul>
+<li><a href="cli/run.html"><code>airml run</code></a> — run inference</li>
+<li><a href="cli/bench.html"><code>airml bench</code></a> — benchmark the model</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="airml-bench"><a class="header" href="#airml-bench"><code>airml bench</code></a></h1>
+<p>Measure inference latency for an ONNX model. Runs warmup iterations first, then reports P50/P95/P99 latency across N timed iterations.</p>
+<h2 id="usage-3"><a class="header" href="#usage-3">Usage</a></h2>
+<pre><code>airml bench --model &lt;PATH-OR-URI&gt; [OPTIONS]
+</code></pre>
+<h2 id="options-3"><a class="header" href="#options-3">Options</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>-m, --model &lt;PATH&gt;</code></td><td>(required)</td><td>ONNX model path or registry id</td></tr>
+<tr><td><code>-n, --iterations &lt;N&gt;</code></td><td><code>100</code></td><td>Number of timed benchmark iterations</td></tr>
+<tr><td><code>-w, --warmup &lt;N&gt;</code></td><td><code>10</code></td><td>Warmup iterations (not counted)</td></tr>
+<tr><td><code>-p, --provider &lt;P&gt;</code></td><td><code>auto</code></td><td>Execution provider</td></tr>
+<tr><td><code>--shape &lt;SHAPE&gt;</code></td><td>(from model)</td><td>Override input shape, e.g. <code>1,3,224,224</code></td></tr>
+</tbody></table>
+</div>
+<h2 id="example-1"><a class="header" href="#example-1">Example</a></h2>
+<pre><code class="language-bash">airml bench -m mobilenetv3-small -n 200 -w 20
+</code></pre>
+<pre><code>Provider: NeuralEngine
+Model:    mobilenetv3-small  [1, 3, 224, 224] -&gt; [1, 1000]
+Warmup:   20 iterations
+Timed:    200 iterations
+
+  Min:  10.1ms
+  P50:  11.2ms
+  P95:  13.8ms
+  P99:  15.1ms
+  Max:  18.4ms
+</code></pre>
+<h2 id="compare-providers"><a class="header" href="#compare-providers">Compare providers</a></h2>
+<pre><code class="language-bash">for p in cpu coreml neural-engine; do
+  echo "=== $p ==="; airml bench -m mobilenetv3-small -p $p -n 100
+done
+</code></pre>
+<h2 id="input-data"><a class="header" href="#input-data">Input data</a></h2>
+<p><code>airml bench</code> generates pseudo-Gaussian synthetic input tensors (CLT-based). This avoids deterministic patterns that might cache artificially well. Use your own data for production-representative benchmarks via <a href="cli/../crates/airml-bench.html"><code>airml-bench</code></a> as a library.</p>
+<h2 id="see-also-3"><a class="header" href="#see-also-3">See also</a></h2>
+<ul>
+<li><a href="cli/../crates/airml-bench.html">airml-bench crate</a> — criterion-based benchmarks for CI</li>
+<li><a href="cli/../operations/performance.html">Performance</a> — community benchmark results</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="airml-install-runtime"><a class="header" href="#airml-install-runtime"><code>airml install-runtime</code></a></h1>
+<p>Auto-download the correct ONNX Runtime shared library for your platform and print the path to set as <code>ORT_DYLIB_PATH</code>.</p>
+<h2 id="usage-4"><a class="header" href="#usage-4">Usage</a></h2>
+<pre><code>airml install-runtime [OPTIONS]
+</code></pre>
+<h2 id="options-4"><a class="header" href="#options-4">Options</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>--version &lt;VER&gt;</code></td><td>latest supported</td><td>ORT version to install</td></tr>
+<tr><td><code>--dir &lt;PATH&gt;</code></td><td><code>/usr/local/lib</code></td><td>Installation directory</td></tr>
+<tr><td><code>--dry-run</code></td><td>off</td><td>Print what would be downloaded without downloading</td></tr>
+</tbody></table>
+</div>
+<h2 id="example-2"><a class="header" href="#example-2">Example</a></h2>
+<pre><code class="language-bash">airml install-runtime
+</code></pre>
+<pre><code>Detecting platform: macOS aarch64
+Downloading onnxruntime-osx-arm64-1.23.1.tgz ...
+  SHA256 verified
+  Installed to /usr/local/lib/onnxruntime-osx-arm64-1.23.1/lib/libonnxruntime.dylib
+
+Add to your shell profile:
+  export ORT_DYLIB_PATH=/usr/local/lib/onnxruntime-osx-arm64-1.23.1/lib/libonnxruntime.dylib
+</code></pre>
+<h2 id="platform-matrix"><a class="header" href="#platform-matrix">Platform matrix</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Platform</th><th>Downloaded file</th></tr></thead><tbody>
+<tr><td>macOS arm64</td><td><code>onnxruntime-osx-arm64-{ver}.tgz</code></td></tr>
+<tr><td>macOS x86_64</td><td><code>onnxruntime-osx-x86_64-{ver}.tgz</code></td></tr>
+<tr><td>Linux x86_64</td><td><code>onnxruntime-linux-x64-{ver}.tgz</code></td></tr>
+<tr><td>Linux arm64</td><td><code>onnxruntime-linux-aarch64-{ver}.tgz</code></td></tr>
+</tbody></table>
+</div>
+<h2 id="making-it-permanent"><a class="header" href="#making-it-permanent">Making it permanent</a></h2>
+<p>Add the printed <code>export</code> line to <code>~/.zshrc</code>, <code>~/.bashrc</code>, or equivalent. Alternatively, set it system-wide via <code>/etc/environment</code> on Linux.</p>
+<h2 id="see-also-4"><a class="header" href="#see-also-4">See also</a></h2>
+<ul>
+<li><a href="cli/../getting-started/installation.html">Installation</a> — full install instructions</li>
+<li><a href="cli/../deployment/systemd.html">systemd deployment</a> — setting ORT_DYLIB_PATH as a service environment variable</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="airml-pull"><a class="header" href="#airml-pull"><code>airml pull</code></a></h1>
+<p>Download and cache a model from the airML registry, a HuggingFace repository, or a direct URL. Models are stored content-addressed in <code>~/.cache/airml/</code> with SHA256 verification.</p>
+<h2 id="usage-5"><a class="header" href="#usage-5">Usage</a></h2>
+<pre><code>airml pull &lt;MODEL&gt; [OPTIONS]
+</code></pre>
+<h2 id="arguments"><a class="header" href="#arguments">Arguments</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Argument</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>&lt;MODEL&gt;</code></td><td>Registry id (<code>bge-small-en</code>), <code>hf://owner/repo[/file]</code> URI, or direct HTTPS URL</td></tr>
+</tbody></table>
+</div>
+<h2 id="options-5"><a class="header" href="#options-5">Options</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>--list</code></td><td>off</td><td>List all available registry models instead of pulling</td></tr>
+<tr><td><code>--cache-dir &lt;PATH&gt;</code></td><td><code>~/.cache/airml</code></td><td>Override cache directory</td></tr>
+<tr><td><code>--force</code></td><td>off</td><td>Re-download even if already cached</td></tr>
+</tbody></table>
+</div>
+<h2 id="examples-2"><a class="header" href="#examples-2">Examples</a></h2>
+<pre><code class="language-bash"># Pull from registry by id
+airml pull bge-small-en
+
+# Pull from HuggingFace
+airml pull hf://Xenova/clip-vit-base-patch32
+
+# Pull a specific file from HuggingFace
+airml pull hf://Xenova/whisper-tiny/onnx/encoder_model.onnx
+
+# Pull from a direct URL
+airml pull https://example.com/my-model.onnx
+
+# List all registry models
+airml pull --list
+</code></pre>
+<h2 id="registry-models"><a class="header" href="#registry-models">Registry models</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>ID</th><th>Source</th><th>Use case</th><th>Size</th></tr></thead><tbody>
+<tr><td><code>bge-small-en</code></td><td>BAAI</td><td>Text embedding</td><td>133 MB</td></tr>
+<tr><td><code>all-minilm-l6-v2</code></td><td>sentence-transformers</td><td>Text embedding</td><td>90 MB</td></tr>
+<tr><td><code>clip-vit-b32</code></td><td>Xenova/CLIP</td><td>Image+text</td><td>605 MB</td></tr>
+<tr><td><code>mobilenetv3-small</code></td><td>onnx/models</td><td>Image classification</td><td>14 MB</td></tr>
+<tr><td><code>whisper-tiny-encoder</code></td><td>Xenova/Whisper</td><td>Audio encoder</td><td>80 MB</td></tr>
+</tbody></table>
+</div>
+<p>Run <code>airml pull --list</code> for the current full registry.</p>
+<h2 id="cache-layout"><a class="header" href="#cache-layout">Cache layout</a></h2>
+<pre><code>~/.cache/airml/
+  bge-small-en.onnx          (symlink to content-addressed blob)
+  blobs/
+    sha256-abc123...          (actual file)
+</code></pre>
+<h2 id="see-also-5"><a class="header" href="#see-also-5">See also</a></h2>
+<ul>
+<li><a href="cli/run.html"><code>airml run</code></a> — run a cached model</li>
+<li><a href="cli/../crates/airml-hub.html">airml-hub crate</a> — programmatic cache API</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="airml-generate"><a class="header" href="#airml-generate"><code>airml generate</code></a></h1>
+<p>Autoregressive text generation from an ONNX language model with KV cache reuse. <strong>This command is a stub in v0.2</strong> — full implementation lands in v0.3.</p>
+<h2 id="status"><a class="header" href="#status">Status</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Version</th><th>Status</th></tr></thead><tbody>
+<tr><td>v0.2</td><td>Stub — command exists, returns placeholder output</td></tr>
+<tr><td>v0.3</td><td>Real autoregressive generation, INT4/INT8 quantization passthrough</td></tr>
+<tr><td>v0.3 target</td><td>≥30 tok/s on M2 Pro for 1B INT4 model</td></tr>
+</tbody></table>
+</div>
+<h2 id="planned-usage-v03"><a class="header" href="#planned-usage-v03">Planned usage (v0.3)</a></h2>
+<pre><code>airml generate --model &lt;PATH&gt; --prompt &lt;TEXT&gt; [OPTIONS]
+</code></pre>
+<h2 id="planned-options"><a class="header" href="#planned-options">Planned options</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>-m, --model &lt;PATH&gt;</code></td><td>(required)</td><td>ONNX LLM path or registry id</td></tr>
+<tr><td><code>--prompt &lt;TEXT&gt;</code></td><td>(required)</td><td>Input prompt</td></tr>
+<tr><td><code>--max-tokens &lt;N&gt;</code></td><td><code>256</code></td><td>Maximum tokens to generate</td></tr>
+<tr><td><code>--temperature &lt;F&gt;</code></td><td><code>0.8</code></td><td>Sampling temperature</td></tr>
+<tr><td><code>--top-p &lt;F&gt;</code></td><td><code>0.95</code></td><td>Nucleus sampling threshold</td></tr>
+<tr><td><code>-p, --provider &lt;P&gt;</code></td><td><code>auto</code></td><td>Execution provider (GPU recommended for LLMs)</td></tr>
+</tbody></table>
+</div>
+<h2 id="provider-note"><a class="header" href="#provider-note">Provider note</a></h2>
+<p>Language models with KV cache benefit from GPU rather than ANE — the auto-tuner sets <code>GPU only</code> for this model class. See <a href="cli/../apple-silicon/compute-units.html">compute units guide</a>.</p>
+<h2 id="roadmap"><a class="header" href="#roadmap">Roadmap</a></h2>
+<p>See <a href="cli/../roadmap.html">ROADMAP.md v0.3</a> for the full milestone list including <code>IoBinding</code> integration and curated <code>llama-3.2-1b-int4</code> model.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="airml-serve"><a class="header" href="#airml-serve"><code>airml serve</code></a></h1>
+<p>Start an OpenAI-compatible HTTP embeddings server. Any OpenAI client library works without modification. Requires the <code>nlp</code> feature: <code>cargo build --release --features nlp</code>.</p>
+<h2 id="usage-6"><a class="header" href="#usage-6">Usage</a></h2>
+<pre><code>airml serve [OPTIONS]
+</code></pre>
+<h2 id="options-6"><a class="header" href="#options-6">Options</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>--bind &lt;HOST:PORT&gt;</code></td><td><code>127.0.0.1:8080</code></td><td>Bind address</td></tr>
+<tr><td><code>--default-model &lt;ID&gt;</code></td><td>none</td><td>Model used when request omits the <code>model</code> field</td></tr>
+<tr><td><code>--auth-token &lt;TOKEN&gt;</code></td><td>none</td><td>Require <code>Authorization: Bearer &lt;TOKEN&gt;</code> on <code>/v1/*</code> routes</td></tr>
+<tr><td><code>--max-request-bytes &lt;N&gt;</code></td><td><code>4194304</code> (4 MiB)</td><td>Request body size limit</td></tr>
+<tr><td><code>--cache-dir &lt;PATH&gt;</code></td><td><code>~/.cache/airml</code></td><td>Override Hub cache directory</td></tr>
+</tbody></table>
+</div>
+<h2 id="endpoints"><a class="header" href="#endpoints">Endpoints</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>POST</code></td><td><code>/v1/embeddings</code></td><td>Generate embeddings (OpenAI-compatible)</td></tr>
+<tr><td><code>GET</code></td><td><code>/v1/models</code></td><td>List registry models</td></tr>
+<tr><td><code>GET</code></td><td><code>/v1/embeddings/info?model=&lt;id&gt;</code></td><td>Cache status for a model</td></tr>
+<tr><td><code>GET</code></td><td><code>/healthz</code></td><td>Health check — always <code>{"status":"ok"}</code></td></tr>
+<tr><td><code>GET</code></td><td><code>/metrics</code></td><td>Prometheus metrics</td></tr>
+</tbody></table>
+</div>
+<h2 id="example-3"><a class="header" href="#example-3">Example</a></h2>
+<pre><code class="language-bash"># Build with nlp feature
+cargo build --release --features nlp
+
+# Pull the model
+airml pull bge-small-en
+
+# Start the server
+airml serve --bind 127.0.0.1:8080
+
+# In another terminal
+curl -s http://127.0.0.1:8080/v1/embeddings \
+  -H "Content-Type: application/json" \
+  -d '{"model":"bge-small-en","input":["Hello, world."]}' \
+  | jq '.data[0].embedding[:5]'
+</code></pre>
+<h2 id="openai-client-compatibility"><a class="header" href="#openai-client-compatibility">OpenAI client compatibility</a></h2>
+<pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI(base_url="http://127.0.0.1:8080/v1", api_key="unused")
+response = client.embeddings.create(model="bge-small-en", input=["Hello"])
+print(response.data[0].embedding[:5])
+</code></pre>
+<h2 id="observability"><a class="header" href="#observability">Observability</a></h2>
+<p>Prometheus metrics are available at <code>/metrics</code>. See <a href="cli/../operations/observability.html">Observability</a> for the full metric list and a sample Grafana dashboard.</p>
+<h2 id="deployment"><a class="header" href="#deployment">Deployment</a></h2>
+<p>For production, run behind nginx or Caddy and use <code>--auth-token</code>. See:</p>
+<ul>
+<li><a href="cli/../deployment/docker.html">Docker deployment</a></li>
+<li><a href="cli/../deployment/systemd.html">systemd deployment</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="airml-system"><a class="header" href="#airml-system"><code>airml system</code></a></h1>
+<p>Print platform capabilities: OS, CPU architecture, Apple Silicon detection, and available ONNX Runtime execution providers.</p>
+<h2 id="usage-7"><a class="header" href="#usage-7">Usage</a></h2>
+<pre><code>airml system
+</code></pre>
+<p>No options or arguments.</p>
+<h2 id="example-output"><a class="header" href="#example-output">Example output</a></h2>
+<p><strong>Apple Silicon Mac:</strong></p>
+<pre><code>OS:               macOS 14.4
+Arch:             aarch64
+Apple Silicon:    true
+ORT version:      1.23.1
+ORT dylib:        /usr/local/lib/onnxruntime-osx-arm64-1.23.1/lib/libonnxruntime.dylib
+
+Available providers:
+  CPU             (always available)
+  CoreML          (macOS 12+)
+  NeuralEngine    (Apple Silicon, macOS 13+)
+</code></pre>
+<p><strong>Linux x86_64:</strong></p>
+<pre><code>OS:               Ubuntu 22.04
+Arch:             x86_64
+Apple Silicon:    false
+ORT version:      1.23.1
+
+Available providers:
+  CPU             (always available)
+</code></pre>
+<h2 id="use-this-to-diagnose-setup-issues"><a class="header" href="#use-this-to-diagnose-setup-issues">Use this to diagnose setup issues</a></h2>
+<p>If CoreML or NeuralEngine do not appear:</p>
+<ol>
+<li>Confirm <code>ORT_DYLIB_PATH</code> is set: <code>echo $ORT_DYLIB_PATH</code></li>
+<li>Confirm the dylib exists: <code>ls $ORT_DYLIB_PATH</code></li>
+<li>Re-run <code>airml install-runtime</code> to reinstall</li>
+</ol>
+<h2 id="see-also-6"><a class="header" href="#see-also-6">See also</a></h2>
+<ul>
+<li><a href="cli/install-runtime.html"><code>airml install-runtime</code></a> — install ONNX Runtime</li>
+<li><a href="cli/../getting-started/installation.html">Installation</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="airml-core"><a class="header" href="#airml-core">airml-core</a></h1>
+<p>The central inference crate. Wraps ONNX Runtime sessions behind a clean Rust API: load a model, run it, get tensors back. All other airML crates depend on this one.</p>
+<p><strong>docs.rs:</strong> <code>https://docs.rs/airml-core</code> (published with v1.0)</p>
+<h2 id="minimal-example"><a class="header" href="#minimal-example">Minimal example</a></h2>
+<pre><pre class="playground"><code class="language-rust">use airml_core::{InferenceEngine, SessionConfig};
+use airml_preprocess::ImagePreprocessor;
+
+fn main() -&gt; anyhow::Result&lt;()&gt; {
+    let engine = InferenceEngine::from_file("model.onnx")?;
+    let input = ImagePreprocessor::imagenet().load_and_process("image.jpg")?;
+    let outputs = engine.run(input.into_dyn())?;
+    println!("{:?}", outputs[0].shape());
+    Ok(())
+}</code></pre></pre>
+<h2 id="key-types"><a class="header" href="#key-types">Key types</a></h2>
+<h3 id="inferenceengine"><a class="header" href="#inferenceengine"><code>InferenceEngine</code></a></h3>
+<p>The main entry point. Load from file or bytes, run inference.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// From file
+let engine = InferenceEngine::from_file("model.onnx")?;
+
+// From bytes (embedded models)
+let engine = InferenceEngine::from_bytes(model_bytes)?;
+
+// With custom config
+let config = SessionConfig::new().with_intra_threads(4);
+let engine = InferenceEngine::from_file_with_config("model.onnx", config)?;
+
+// Inference
+let outputs: Vec&lt;ArrayD&lt;f32&gt;&gt; = engine.run(input)?;
+let outputs = engine.run_multiple(vec![input_a, input_b])?;
+let outputs = engine.run_named(vec![("input_ids", ids), ("attention_mask", mask)])?;
+<span class="boring">}</span></code></pre></pre>
+<h3 id="sessionconfig"><a class="header" href="#sessionconfig"><code>SessionConfig</code></a></h3>
+<p>Builder for ONNX Runtime session options.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let config = SessionConfig::new()
+    .with_intra_threads(4)
+    .with_inter_threads(2)
+    .with_optimization_level(level)
+    .with_providers(providers);
+<span class="boring">}</span></code></pre></pre>
+<h3 id="modelmetadata"><a class="header" href="#modelmetadata"><code>ModelMetadata</code></a></h3>
+<p>Returned by <code>engine.metadata()</code> — model name, description, version, producer, input/output tensor info.</p>
+<h3 id="airmlerror"><a class="header" href="#airmlerror"><code>AirMLError</code></a></h3>
+<p>All errors are variants of <code>AirMLError</code>: <code>ModelNotFound</code>, <code>ModelLoadError</code>, <code>InferenceError</code>, <code>PreprocessError</code>, <code>ConfigError</code>, <code>OrtError</code>.</p>
+<h2 id="stability"><a class="header" href="#stability">Stability</a></h2>
+<p>Public API is tracked via <code>cargo public-api</code>. Breaking changes are gated until v1.0. See <a href="crates/../operations/stability.html">Stability</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="airml-providers"><a class="header" href="#airml-providers">airml-providers</a></h1>
+<p>Execution provider abstractions for ONNX Runtime. Wraps CoreML, CPU, and future GPU providers behind a uniform <code>into_dispatch()</code> interface consumed by <code>SessionConfig</code>.</p>
+<h2 id="key-types-1"><a class="header" href="#key-types-1">Key types</a></h2>
+<h3 id="cpuprovider"><a class="header" href="#cpuprovider"><code>CpuProvider</code></a></h3>
+<p>Always available, zero configuration:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use airml_providers::CpuProvider;
+let provider = CpuProvider::default().into_dispatch();
+<span class="boring">}</span></code></pre></pre>
+<h3 id="coremlprovider-coreml-feature"><a class="header" href="#coremlprovider-coreml-feature"><code>CoreMLProvider</code> (coreml feature)</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use airml_providers::{CoreMLProvider, ComputeUnits};
+
+let provider = CoreMLProvider::default()
+    .with_compute_units(ComputeUnits::CpuAndNeuralEngine)
+    .with_subgraphs(true)
+    .into_dispatch();
+<span class="boring">}</span></code></pre></pre>
+<p>Convenience constructors:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>CoreMLProvider::default().neural_engine_only()  // ANE + CPU
+CoreMLProvider::default().gpu_only()            // GPU (no ANE)
+CoreMLProvider::default().cpu_only()
+<span class="boring">}</span></code></pre></pre>
+<h3 id="computeunits"><a class="header" href="#computeunits"><code>ComputeUnits</code></a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub enum ComputeUnits {
+    All,               // CPU + GPU + ANE
+    CpuAndNeuralEngine,
+    CpuAndGpu,
+    CpuOnly,
+}
+<span class="boring">}</span></code></pre></pre>
+<h3 id="coremlmodelformat"><a class="header" href="#coremlmodelformat"><code>CoreMLModelFormat</code></a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub enum CoreMLModelFormat {
+    NeuralNetwork,  // Broader macOS/iOS compatibility
+    MLProgram,      // More operators, potentially faster
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="utility-functions"><a class="header" href="#utility-functions">Utility functions</a></h2>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Auto-select best providers for this platform
+let providers = airml_providers::auto_select_providers();
+
+// Check platform
+let is_as = airml_providers::is_apple_silicon();
+let info: SystemInfo = airml_providers::system_info();
+<span class="boring">}</span></code></pre></pre>
+<h2 id="see-also-7"><a class="header" href="#see-also-7">See also</a></h2>
+<ul>
+<li><a href="crates/../apple-silicon/compute-units.html">Compute units guide</a></li>
+<li><a href="crates/../apple-silicon/auto-tuner.html">Auto-tuner overview</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="airml-tune"><a class="header" href="#airml-tune">airml-tune</a></h1>
+<p>The auto-tuner crate. Contains <code>BackendOracle</code>, which analyzes an ONNX model's graph structure and recommends the optimal CoreML compute units without requiring a test run.</p>
+<h2 id="how-it-works"><a class="header" href="#how-it-works">How it works</a></h2>
+<p><code>BackendOracle::recommend_for_path</code> parses the ONNX protobuf graph, builds an op-histogram, and applies heuristics based on model family classification:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use airml_tune::BackendOracle;
+
+let recommendation = BackendOracle::recommend_for_path("model.onnx")?;
+println!("{:?}", recommendation.compute_units);
+println!("{}", recommendation.reason);
+<span class="boring">}</span></code></pre></pre>
+<h2 id="heuristic-table"><a class="header" href="#heuristic-table">Heuristic table</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Model class</th><th>Auto pick</th><th>Reason</th></tr></thead><tbody>
+<tr><td>Vision (Conv-heavy)</td><td>ANE only</td><td>ANE excels at convolution</td></tr>
+<tr><td>Text encoder, static shapes</td><td>ANE only</td><td>Best ANE throughput</td></tr>
+<tr><td>Text encoder, dynamic shapes</td><td>All compute units</td><td>Let CoreML decide per shape</td></tr>
+<tr><td>Image+Text dual encoder</td><td>All compute units</td><td>Mixed workload</td></tr>
+<tr><td>Language model (KV cache)</td><td>GPU only</td><td>ANE struggles with autoregressive control flow</td></tr>
+</tbody></table>
+</div>
+<h2 id="onnx-graph-parser"><a class="header" href="#onnx-graph-parser">ONNX graph parser</a></h2>
+<p>The graph parser (<code>src/graph_parser.rs</code>) is a hand-rolled protobuf reader with zero external dependencies. It is fuzz-tested nightly — see <a href="crates/../operations/stability.html">Stability</a>.</p>
+<h2 id="v04-improvements"><a class="header" href="#v04-improvements">v0.4 improvements</a></h2>
+<p>v0.4 will replace family heuristics with actual per-op latency profiling. See the <a href="crates/../roadmap.html">roadmap</a>.</p>
+<h2 id="see-also-8"><a class="header" href="#see-also-8">See also</a></h2>
+<ul>
+<li><a href="crates/../apple-silicon/auto-tuner.html">Auto-tuner overview</a></li>
+<li><a href="crates/../apple-silicon/compute-units.html">Compute units guide</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="airml-hub"><a class="header" href="#airml-hub">airml-hub</a></h1>
+<p>Content-addressed model cache with HuggingFace and registry download support. Powers <code>airml pull</code> and provides a programmatic API for embedding model fetching in Rust applications.</p>
+<h2 id="usage-8"><a class="header" href="#usage-8">Usage</a></h2>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use airml_hub::{Hub, ModelId};
+
+let hub = Hub::default();  // uses ~/.cache/airml
+
+// Pull by registry id
+let path = hub.pull("bge-small-en").await?;
+
+// Pull from HuggingFace
+let path = hub.pull("hf://Xenova/clip-vit-base-patch32").await?;
+
+// Pull from URL
+let path = hub.pull("https://example.com/model.onnx").await?;
+
+// Check if cached
+let cached = hub.is_cached("bge-small-en");
+<span class="boring">}</span></code></pre></pre>
+<h2 id="cache-layout-1"><a class="header" href="#cache-layout-1">Cache layout</a></h2>
+<p>Models are stored content-addressed by SHA256:</p>
+<pre><code>~/.cache/airml/
+  bge-small-en.onnx       -&gt; blobs/sha256-abc123...
+  blobs/
+    sha256-abc123...       (immutable blob)
+</code></pre>
+<p>Re-downloading the same content is a no-op. <code>--force</code> bypasses the cache check.</p>
+<h2 id="custom-cache-directory"><a class="header" href="#custom-cache-directory">Custom cache directory</a></h2>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let hub = Hub::with_cache_dir("/path/to/cache");
+<span class="boring">}</span></code></pre></pre>
+<p>Or via environment variable:</p>
+<pre><code class="language-bash">export AIRML_CACHE_DIR=/path/to/cache
+</code></pre>
+<h2 id="registry"><a class="header" href="#registry">Registry</a></h2>
+<p>The built-in registry (<code>src/registry.rs</code>) maps short ids to download URIs and expected SHA256 hashes. Community additions are welcome — see <a href="crates/../contributing.html">Contributing</a>.</p>
+<h2 id="see-also-9"><a class="header" href="#see-also-9">See also</a></h2>
+<ul>
+<li><a href="crates/../cli/pull.html"><code>airml pull</code></a> — CLI interface to hub</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="airml-embed-1"><a class="header" href="#airml-embed-1">airml-embed</a></h1>
+<p>Utilities for embedding ONNX models directly into Rust binaries at compile time. The model bytes are baked into the binary via <code>include_bytes!</code>, so no external file is needed at runtime.</p>
+<h2 id="usage-9"><a class="header" href="#usage-9">Usage</a></h2>
+<h3 id="manual-embedding"><a class="header" href="#manual-embedding">Manual embedding</a></h3>
+<pre><pre class="playground"><code class="language-rust">use airml_embed::EmbeddedModel;
+
+static MODEL: &amp;[u8] = include_bytes!("../models/resnet50.onnx");
+
+fn main() -&gt; anyhow::Result&lt;()&gt; {
+    let engine = EmbeddedModel::new(MODEL).into_engine()?;
+    // use engine...
+    Ok(())
+}</code></pre></pre>
+<h3 id="with-custom-config"><a class="header" href="#with-custom-config">With custom config</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use airml_embed::EmbeddedModel;
+use airml_core::SessionConfig;
+
+let config = SessionConfig::new().with_intra_threads(2);
+let engine = EmbeddedModel::with_config(MODEL, config).into_engine()?;
+<span class="boring">}</span></code></pre></pre>
+<h3 id="embed_model-macro"><a class="header" href="#embed_model-macro"><code>embed_model!</code> macro</a></h3>
+<pre><pre class="playground"><code class="language-rust">use airml_embed::embed_model;
+
+// Declares a static EmbeddedModel
+embed_model!(RESNET, "../models/resnet50.onnx");
+
+fn main() -&gt; anyhow::Result&lt;()&gt; {
+    let engine = RESNET.clone().into_engine()?;
+    Ok(())
+}</code></pre></pre>
+<p>The macro uses <code>LazyLock</code> internally for non-const initialization.</p>
+<h2 id="trade-offs"><a class="header" href="#trade-offs">Trade-offs</a></h2>
+<div class="table-wrapper"><table><thead><tr><th></th><th>Embedded</th><th>Filesystem</th></tr></thead><tbody>
+<tr><td>Deploy</td><td>Single binary</td><td>Binary + model file</td></tr>
+<tr><td>Binary size</td><td>+model size</td><td>Unchanged</td></tr>
+<tr><td>Update model</td><td>Recompile</td><td>Replace file</td></tr>
+<tr><td>Memory</td><td>Baked into BSS</td><td>Mapped from disk</td></tr>
+</tbody></table>
+</div>
+<p>Embedded models make sense for small models (&lt; 20 MB). For larger models, use <a href="crates/airml-hub.html"><code>airml-hub</code></a> for on-demand download.</p>
+<h2 id="see-also-10"><a class="header" href="#see-also-10">See also</a></h2>
+<ul>
+<li><a href="https://github.com/rlaope/airML/blob/master/examples/03_embedded_model.rs">examples/03_embedded_model.rs</a></li>
+<li><a href="https://github.com/rlaope/airML/blob/master/examples/04_embedded_compiletime.rs">examples/04_embedded_compiletime.rs</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="airml-bench-1"><a class="header" href="#airml-bench-1">airml-bench</a></h1>
+<p>Criterion-based benchmark harness for measuring airML inference performance in CI. Complements the CLI <code>airml bench</code> command with reproducible, statistically sound benchmarks that track regressions across commits.</p>
+<h2 id="running-benchmarks"><a class="header" href="#running-benchmarks">Running benchmarks</a></h2>
+<pre><code class="language-bash">cargo bench -p airml-bench
+</code></pre>
+<p>Results are written to <code>target/criterion/</code>. Criterion generates HTML reports at <code>target/criterion/report/index.html</code>.</p>
+<h2 id="contributing-benchmark-results"><a class="header" href="#contributing-benchmark-results">Contributing benchmark results</a></h2>
+<p>Run on your hardware and PR the results to <code>bench/results/</code>:</p>
+<pre><code class="language-bash">cargo bench -p airml-bench 2&gt;&amp;1 | tee bench/results/$(uname -m)-$(date +%Y%m%d).txt
+</code></pre>
+<p>See <code>bench/Makefile</code> for the full benchmark matrix and <code>bench/run-all.sh</code> for the automation script.</p>
+<h2 id="input-data-1"><a class="header" href="#input-data-1">Input data</a></h2>
+<p>The benchmark harness generates pseudo-Gaussian synthetic inputs using a CLT-based approximation. This avoids deterministic all-zeros inputs that cache artificially well and produce misleadingly low latency numbers.</p>
+<h2 id="performance-numbers"><a class="header" href="#performance-numbers">Performance numbers</a></h2>
+<p>Reproducible numbers from M2 Pro / macOS 14:</p>
+<div class="table-wrapper"><table><thead><tr><th>Provider</th><th>Model</th><th>Latency</th><th>Throughput</th></tr></thead><tbody>
+<tr><td>CPU</td><td>ResNet50</td><td>—</td><td>—</td></tr>
+<tr><td>CoreML (All)</td><td>ResNet50</td><td>—</td><td>—</td></tr>
+<tr><td>Neural Engine</td><td>ResNet50</td><td>—</td><td>—</td></tr>
+</tbody></table>
+</div>
+<blockquote>
+<p>Help wanted: run <code>cargo bench -p airml-bench</code> on your hardware and PR results.</p>
+</blockquote>
+<h2 id="see-also-11"><a class="header" href="#see-also-11">See also</a></h2>
+<ul>
+<li><a href="crates/../cli/bench.html"><code>airml bench</code> CLI</a></li>
+<li><a href="crates/../operations/performance.html">Performance</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="airml-preprocess"><a class="header" href="#airml-preprocess">airml-preprocess</a></h1>
+<p>Image and text preprocessing for ONNX models. Provides typed presets for the most common normalization pipelines so you don't have to hand-roll tensor transforms.</p>
+<h2 id="image-preprocessing"><a class="header" href="#image-preprocessing">Image preprocessing</a></h2>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use airml_preprocess::ImagePreprocessor;
+
+// ImageNet preset: 224x224, RGB, standard normalization
+let preprocessor = ImagePreprocessor::imagenet();
+
+// CLIP preset: 224x224, CLIP normalization
+let preprocessor = ImagePreprocessor::clip();
+
+// YOLO preset: 640x640, letterbox, no normalization
+let preprocessor = ImagePreprocessor::yolo(640);
+
+// Custom
+let preprocessor = ImagePreprocessor::custom(
+    224, 224,
+    [0.485, 0.456, 0.406],  // mean
+    [0.229, 0.224, 0.225],  // std
+);
+
+// Load and preprocess
+let tensor: Array4&lt;f32&gt; = preprocessor.load_and_process("image.jpg")?;
+
+// Preprocess an already-loaded image
+let img = image::open("image.jpg")?;
+let tensor = preprocessor.process(&amp;img)?;
+<span class="boring">}</span></code></pre></pre>
+<h3 id="resize-modes"><a class="header" href="#resize-modes">Resize modes</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub enum ResizeMode {
+    Stretch,    // Distort to fit target size
+    Crop,       // Center crop to fit
+    Letterbox,  // Pad with black to preserve aspect ratio (YOLO default)
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="text-preprocessing-nlp-feature"><a class="header" href="#text-preprocessing-nlp-feature">Text preprocessing (nlp feature)</a></h2>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[cfg(feature = "nlp")]
+use airml_preprocess::{TextPreprocessor, TokenizedInput};
+
+let preprocessor = TextPreprocessor::from_file("tokenizer.json")?
+    .with_max_length(512)
+    .with_padding(true)
+    .with_truncation(true);
+
+let encoded: TokenizedInput = preprocessor.encode("Hello, world.")?;
+let (input_ids, attention_mask) = encoded.to_array();
+
+// Batch
+let batch = preprocessor.encode_batch(&amp;["Hello", "World"])?;
+<span class="boring">}</span></code></pre></pre>
+<h2 id="preset-normalization-values"><a class="header" href="#preset-normalization-values">Preset normalization values</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Preset</th><th>Mean</th><th>Std</th></tr></thead><tbody>
+<tr><td>ImageNet</td><td>[0.485, 0.456, 0.406]</td><td>[0.229, 0.224, 0.225]</td></tr>
+<tr><td>CLIP</td><td>[0.481, 0.457, 0.408]</td><td>[0.268, 0.261, 0.275]</td></tr>
+<tr><td>YOLO</td><td>none</td><td>none</td></tr>
+</tbody></table>
+</div>
+<h2 id="see-also-12"><a class="header" href="#see-also-12">See also</a></h2>
+<ul>
+<li><a href="crates/airml-core.html">airml-core</a> — inference engine that consumes preprocessed tensors</li>
+<li><a href="crates/../cli/run.html"><code>airml run --preprocess</code></a> — CLI preprocessing flag</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="auto-tuner-overview"><a class="header" href="#auto-tuner-overview">Auto-tuner overview</a></h1>
+<p><code>airml-tune</code> solves a real problem: CoreML has four compute unit settings, and picking the wrong one costs 2-5x latency. The auto-tuner parses your model's ONNX graph and recommends the right setting without requiring a test run.</p>
+<h2 id="how-it-works-1"><a class="header" href="#how-it-works-1">How it works</a></h2>
+<ol>
+<li><strong>Parse</strong> — <code>BackendOracle::recommend_for_path</code> reads the ONNX protobuf and builds an op-histogram (a count of each operator type).</li>
+<li><strong>Classify</strong> — the histogram is matched against model family patterns (Conv-heavy = vision, MatMul-heavy with attention = text encoder, etc.).</li>
+<li><strong>Recommend</strong> — each family maps to a <code>ComputeUnits</code> setting based on empirical profiling.</li>
+</ol>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use airml_tune::BackendOracle;
+
+let rec = BackendOracle::recommend_for_path("model.onnx")?;
+println!("Use: {:?}", rec.compute_units);
+println!("Why: {}", rec.reason);
+<span class="boring">}</span></code></pre></pre>
+<h2 id="heuristic-table-1"><a class="header" href="#heuristic-table-1">Heuristic table</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Model class</th><th>Auto pick</th><th>Reason</th></tr></thead><tbody>
+<tr><td>Vision (Conv-heavy)</td><td><code>ANE only</code></td><td>ANE excels at depthwise + pointwise conv</td></tr>
+<tr><td>Text encoder, static shapes</td><td><code>ANE only</code></td><td>Highest ANE throughput for fixed-shape MatMuls</td></tr>
+<tr><td>Text encoder, dynamic shapes</td><td><code>All compute units</code></td><td>Let CoreML reschedule per shape at runtime</td></tr>
+<tr><td>Image+Text dual encoder (e.g. CLIP)</td><td><code>All compute units</code></td><td>Mixed workload; neither CPU nor ANE dominates</td></tr>
+<tr><td>Language model (KV cache, autoregressive)</td><td><code>GPU only</code></td><td>ANE scheduling overhead hurts sequential decoding</td></tr>
+</tbody></table>
+</div>
+<h2 id="overriding-the-recommendation"><a class="header" href="#overriding-the-recommendation">Overriding the recommendation</a></h2>
+<p>Pass <code>--provider</code> to any inference command:</p>
+<pre><code class="language-bash">airml run -m clip-vit-b32 -i photo.jpg --provider neural-engine
+</code></pre>
+<p>Or in code:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use airml_providers::{CoreMLProvider, ComputeUnits};
+let provider = CoreMLProvider::default()
+    .with_compute_units(ComputeUnits::CpuAndNeuralEngine)
+    .into_dispatch();
+<span class="boring">}</span></code></pre></pre>
+<h2 id="v04-improvements-1"><a class="header" href="#v04-improvements-1">v0.4 improvements</a></h2>
+<p>v0.4 will replace family heuristics with per-op latency profiling: the oracle will profile each op on real hardware once, cache the results, and use those numbers for future recommendations. See <a href="apple-silicon/../roadmap.html">Roadmap</a>.</p>
+<h2 id="see-also-13"><a class="header" href="#see-also-13">See also</a></h2>
+<ul>
+<li><a href="apple-silicon/compute-units.html">Compute units guide</a></li>
+<li><a href="apple-silicon/model-formats.html">CoreML model formats</a></li>
+<li><a href="apple-silicon/../crates/airml-tune.html">airml-tune crate</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="compute-units-guide"><a class="header" href="#compute-units-guide">Compute units guide</a></h1>
+<p>CoreML exposes four compute unit settings that control which hardware runs your model. Choosing correctly can cut latency by 2-5x.</p>
+<h2 id="the-four-settings"><a class="header" href="#the-four-settings">The four settings</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Setting</th><th>Hardware used</th><th>Best for</th></tr></thead><tbody>
+<tr><td><code>All</code></td><td>CPU + GPU + Neural Engine</td><td>Mixed workloads; let CoreML decide</td></tr>
+<tr><td><code>CpuAndNeuralEngine</code></td><td>CPU + ANE (no GPU)</td><td>Static-shape encoders; best ANE throughput</td></tr>
+<tr><td><code>CpuAndGpu</code></td><td>CPU + GPU (no ANE)</td><td>Dynamic-shape models; GPU memory bandwidth</td></tr>
+<tr><td><code>CpuOnly</code></td><td>CPU only</td><td>Debugging; compatibility fallback</td></tr>
+</tbody></table>
+</div>
+<h2 id="which-setting-to-use"><a class="header" href="#which-setting-to-use">Which setting to use</a></h2>
+<p>Use the auto-tuner (<code>--provider auto</code>) and let <code>BackendOracle</code> decide. If you need to override:</p>
+<ul>
+<li><strong>Vision models</strong> (MobileNet, ResNet, EfficientNet): <code>neural-engine</code></li>
+<li><strong>Text encoders, fixed input length</strong> (BGE, MiniLM): <code>neural-engine</code></li>
+<li><strong>Text encoders, variable input length</strong>: <code>coreml</code> (All)</li>
+<li><strong>CLIP, dual encoders</strong>: <code>coreml</code> (All)</li>
+<li><strong>Language models with KV cache</strong>: <code>gpu_only</code> — ANE scheduling overhead hurts autoregressive decoding</li>
+</ul>
+<h2 id="coreml-vs-cpu-fallback"><a class="header" href="#coreml-vs-cpu-fallback">CoreML vs CPU fallback</a></h2>
+<p>CoreML compilation happens at first load and is cached in <code>~/Library/Caches/com.apple.coreml</code>. If compilation fails for a given setting, ORT falls back to CPU automatically. Set <code>RUST_LOG=debug</code> to see which provider ORT actually used:</p>
+<pre><code class="language-bash">RUST_LOG=airml_core=debug airml run -m mobilenetv3-small -i cat.jpg
+</code></pre>
+<h2 id="api"><a class="header" href="#api">API</a></h2>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use airml_providers::{CoreMLProvider, ComputeUnits};
+
+let provider = CoreMLProvider::default()
+    .with_compute_units(ComputeUnits::CpuAndNeuralEngine)
+    .into_dispatch();
+<span class="boring">}</span></code></pre></pre>
+<h2 id="see-also-14"><a class="header" href="#see-also-14">See also</a></h2>
+<ul>
+<li><a href="apple-silicon/auto-tuner.html">Auto-tuner overview</a></li>
+<li><a href="apple-silicon/model-formats.html">CoreML model formats</a></li>
+<li><a href="apple-silicon/../crates/airml-providers.html">airml-providers</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="coreml-model-formats"><a class="header" href="#coreml-model-formats">CoreML model formats</a></h1>
+<p>When airML runs a model via CoreML, ORT converts the ONNX graph to a CoreML model internally. CoreML supports two model formats: NeuralNetwork and MLProgram.</p>
+<h2 id="neuralnetwork"><a class="header" href="#neuralnetwork">NeuralNetwork</a></h2>
+<p>The original CoreML format. Supported from macOS 10.13 / iOS 11.</p>
+<ul>
+<li>Broader operator coverage for older macOS/iOS targets</li>
+<li>More mature toolchain support</li>
+<li>Required for some older CoreML operator patterns</li>
+</ul>
+<h2 id="mlprogram"><a class="header" href="#mlprogram">MLProgram</a></h2>
+<p>Introduced with CoreML 5 (macOS 12 / iOS 15). The recommended format for new deployments.</p>
+<ul>
+<li>Supports more operators (including some Transformer attention patterns)</li>
+<li>Can achieve better performance on ANE for modern model architectures</li>
+<li>Required for some newer operator types that ORT generates</li>
+</ul>
+<h2 id="setting-the-format"><a class="header" href="#setting-the-format">Setting the format</a></h2>
+<p>airML defaults to letting ORT choose. To pin a format:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use airml_providers::{CoreMLProvider, CoreMLModelFormat};
+
+let provider = CoreMLProvider::default()
+    .with_model_format(CoreMLModelFormat::MLProgram)
+    .into_dispatch();
+<span class="boring">}</span></code></pre></pre>
+<h2 id="compilation-cache"><a class="header" href="#compilation-cache">Compilation cache</a></h2>
+<p>CoreML compiles the model on first load and caches the <code>.mlmodelc</code> package at:</p>
+<pre><code>~/Library/Caches/com.apple.coreml/
+</code></pre>
+<p>If you change the model or the format setting, delete this cache to force recompilation:</p>
+<pre><code class="language-bash">rm -rf ~/Library/Caches/com.apple.coreml/
+</code></pre>
+<h2 id="troubleshooting"><a class="header" href="#troubleshooting">Troubleshooting</a></h2>
+<p>If CoreML fails to compile your model:</p>
+<ol>
+<li>Check <code>RUST_LOG=debug</code> output for the specific error</li>
+<li>Try <code>MLProgram</code> if using <code>NeuralNetwork</code> (or vice versa)</li>
+<li>Fall back to <code>--provider cpu</code> to confirm the model itself is valid</li>
+<li>File an issue with the model provenance and the debug log</li>
+</ol>
+<h2 id="see-also-15"><a class="header" href="#see-also-15">See also</a></h2>
+<ul>
+<li><a href="apple-silicon/compute-units.html">Compute units guide</a></li>
+<li><a href="apple-silicon/auto-tuner.html">Auto-tuner overview</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="architecture-overview"><a class="header" href="#architecture-overview">Architecture Overview</a></h1>
+<p>airML is a multi-crate Rust workspace designed around a single principle: zero runtime dependencies for the end user. ONNX Runtime is linked statically and distributed as part of the binary, so there is nothing to install beyond the <code>airml</code> executable itself.</p>
+<p>The workspace is split into focused crates, each owning a narrow slice of responsibility. The CLI (<code>src/</code>) wires them together at the top level, delegating to <code>airml-hub</code> for model acquisition, <code>airml-tune</code> for backend selection, <code>airml-core</code> for inference, and <code>airml-preprocess</code> for input preparation.</p>
+<pre><code class="language-mermaid">graph LR
+    user[User CLI] --&gt; airml
+    airml --&gt; core[airml-core]
+    airml --&gt; hub[airml-hub: model cache]
+    airml --&gt; tune[airml-tune: backend dispatch]
+    core --&gt; ort[ort 2.0]
+    ort -.-&gt; coreml[CoreML / ANE / Metal]
+    ort -.-&gt; cpu[CPU]
+</code></pre>
+<p>Hardware acceleration is entirely opt-in via Cargo feature flags. The <code>coreml</code> feature enables Apple Neural Engine dispatch through <code>airml-providers</code>; omitting it falls back to CPU silently. This keeps the binary lean on platforms where CoreML is unavailable.</p>
+<p>See the following pages for a deeper look at each layer:</p>
+<ul>
+<li><a href="architecture/workspace.html">Workspace topology</a> — crate dependency graph</li>
+<li><a href="architecture/inference-flow.html">Inference flow</a> — request lifecycle from CLI to ORT</li>
+<li><a href="architecture/auto-tuner.html">Auto-tuner internals</a> — how <code>airml-tune</code> picks compute units</li>
+<li><a href="architecture/hub.html">Hub &amp; cache</a> — content-addressed model storage</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="workspace-topology"><a class="header" href="#workspace-topology">Workspace Topology</a></h1>
+<p>The airML workspace contains seven crates. Solid arrows indicate <code>[dependencies]</code> entries; dashed arrows indicate optional or feature-gated dependencies.</p>
+<pre><code class="language-mermaid">graph TD
+    cli[airml CLI] --&gt; core[airml-core]
+    cli --&gt; hub[airml-hub]
+    cli --&gt; tune[airml-tune]
+    cli --&gt; preprocess[airml-preprocess]
+    cli --&gt; embed[airml-embed]
+    cli --&gt; bench[airml-bench]
+    tune --&gt; core
+    embed --&gt; core
+    bench --&gt; core
+    bench --&gt; providers[airml-providers]
+    core --&gt; ort[ort 2.0.0-rc.11]
+    providers --&gt; ort
+    preprocess -.-&gt; tokenizers[tokenizers]
+    preprocess -.-&gt; image_crate[image]
+</code></pre>
+<h2 id="crate-responsibilities"><a class="header" href="#crate-responsibilities">Crate responsibilities</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Crate</th><th>Responsibility</th></tr></thead><tbody>
+<tr><td><code>airml-core</code></td><td><code>InferenceEngine</code>, <code>SessionConfig</code>, <code>ModelMetadata</code> — wraps ORT sessions</td></tr>
+<tr><td><code>airml-hub</code></td><td>Content-addressed model download and caching (<code>ModelUri</code>, <code>Fetcher</code>, <code>ModelCache</code>)</td></tr>
+<tr><td><code>airml-tune</code></td><td>Backend oracle and auto-tuner (<code>BackendOracle</code>, <code>OpHistogram</code>, graph parser)</td></tr>
+<tr><td><code>airml-preprocess</code></td><td>Image and text preprocessing (<code>ImagePreprocessor</code>, <code>TextPreprocessor</code>)</td></tr>
+<tr><td><code>airml-embed</code></td><td>Utilities for embedding ONNX models in Rust binaries at compile time</td></tr>
+<tr><td><code>airml-bench</code></td><td>Latency benchmarking (<code>BenchRunner</code>, statistics)</td></tr>
+<tr><td><code>airml-providers</code></td><td>Execution provider abstraction (<code>CpuProvider</code>, <code>CoreMLProvider</code>)</td></tr>
+</tbody></table>
+</div>
+<p><code>airml-core</code> and <code>airml-providers</code> are the only crates that link against ORT. All others stay ORT-free, which keeps compile times short for library consumers that only need model acquisition or preprocessing.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="inference-flow"><a class="header" href="#inference-flow">Inference Flow</a></h1>
+<p>This sequence diagram shows the complete request lifecycle for <code>airml run</code>, from the user's command line through to output.</p>
+<pre><code class="language-mermaid">sequenceDiagram
+    participant User
+    participant CLI as airml CLI
+    participant Hub as airml-hub
+    participant Oracle as BackendOracle
+    participant Engine as InferenceEngine
+    participant ORT as ort / ONNX Runtime
+
+    User-&gt;&gt;CLI: airml run -m hf://owner/repo --input img.jpg
+    CLI-&gt;&gt;Hub: ModelUri::parse() → resolve_to_path()
+    Hub--&gt;&gt;CLI: /path/to/cached/model.onnx
+    CLI-&gt;&gt;Oracle: recommend_for_path(model.onnx)
+    Oracle--&gt;&gt;CLI: BackendRecommendation (e.g. CoreMLAneOnly)
+    CLI-&gt;&gt;Engine: InferenceEngine::from_file_with_config()
+    CLI-&gt;&gt;Engine: engine.run(preprocessed_input)
+    Engine-&gt;&gt;ORT: Session::run()
+    ORT--&gt;&gt;Engine: output tensors
+    Engine--&gt;&gt;CLI: Vec&lt;OrtValue&gt;
+    CLI--&gt;&gt;User: classification / embedding output
+</code></pre>
+<h2 id="key-design-decisions"><a class="header" href="#key-design-decisions">Key design decisions</a></h2>
+<p><strong>Model resolution is synchronous.</strong> <code>Fetcher::resolve_to_path</code> either returns a cached path instantly or blocks on an HTTP download. There is no async runtime; the CLI is a short-lived process where simplicity beats throughput.</p>
+<p><strong>Backend selection happens before session creation.</strong> The <code>BackendOracle</code> reads the ONNX graph op histogram <em>before</em> the ORT session is opened, so the session is configured with the correct providers from the start. There is no runtime provider fallback.</p>
+<p><strong>Preprocessing is separate from inference.</strong> <code>ImagePreprocessor</code> and <code>TextPreprocessor</code> live in <code>airml-preprocess</code> and return plain <code>ndarray</code> arrays. <code>InferenceEngine::run</code> accepts any <code>OrtValue</code>-compatible input, keeping the inference path provider-agnostic.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="auto-tuner-internals"><a class="header" href="#auto-tuner-internals">Auto-Tuner Internals</a></h1>
+<p><code>airml-tune</code> contains a stateless <code>BackendOracle</code> that maps model characteristics to a <code>BackendRecommendation</code> without running any benchmarks.</p>
+<pre><code class="language-mermaid">flowchart TD
+    A[ModelMetadata + ONNX graph bytes] --&gt; B{Parse op histogram}
+    B --&gt;|parse ok| C[OpHistogram: counts per op_type]
+    B --&gt;|parse error / no file| D[Heuristic from input tensor names]
+    C --&gt; E{dominant_class thresholds}
+    D --&gt; F[infer_family from input names]
+    F --&gt; G[infer_op_class from ModelFamily]
+    E --&gt;|Conv &gt; 30%| H[OpClass::ConvHeavy]
+    E --&gt;|MatMul/Gemm &gt; 40%| I[OpClass::GemmHeavy]
+    E --&gt;|Attention &gt; 20%| J[OpClass::AttentionHeavy]
+    E --&gt;|ControlFlow &gt; 5%| K[OpClass::ControlFlow]
+    E --&gt;|fallback| L[OpClass::Mixed]
+    G --&gt; M[ModelProfile]
+    H --&gt; M
+    I --&gt; M
+    J --&gt; M
+    K --&gt; M
+    L --&gt; M
+    M --&gt; N{BackendOracle::recommend}
+    N --&gt;|Vision + ConvHeavy| O[CoreMLAneOnly]
+    N --&gt;|TextEncoder + AttentionHeavy + static shapes| O
+    N --&gt;|TextEncoder + AttentionHeavy + dynamic shapes| P[CoreMLAll]
+    N --&gt;|ImageTextDual + Mixed| P
+    N --&gt;|LanguageModel + ControlFlow| Q[CoreMLGpuOnly]
+    N --&gt;|Unknown + dynamic| R[CpuOnlyWithReason]
+    N --&gt;|catch-all| P
+</code></pre>
+<h2 id="two-classification-paths"><a class="header" href="#two-classification-paths">Two classification paths</a></h2>
+<p><strong>Metadata path</strong> (<code>profile_from_metadata</code>): uses input tensor names and shapes only. Fast — no file I/O. Input names like <code>pixel_values</code>, <code>input_ids</code>, or <code>attention_mask</code> map directly to <code>ModelFamily</code> variants, which are then mapped to <code>OpClass</code>.</p>
+<p><strong>Graph path</strong> (<code>profile_from_path</code>): reads the raw ONNX protobuf and counts every <code>NodeProto.op_type</code> without pulling in <code>prost</code> or requiring <code>protoc</code>. The resulting <code>OpHistogram</code> applies fractional thresholds to determine <code>OpClass</code>. This path is more accurate for models with unusual input naming.</p>
+<p>For best results, combine both: call <code>profile_from_metadata</code> to get family and dynamic-shape info, then patch <code>dominant_op_class</code> from the histogram if the model file is available.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="hub--cache"><a class="header" href="#hub--cache">Hub &amp; Cache</a></h1>
+<p><code>airml-hub</code> provides zero-friction model acquisition. A single <code>ModelUri</code> string covers four source types: built-in registry IDs, HuggingFace repositories, arbitrary HTTPS URLs, and local paths.</p>
+<pre><code class="language-mermaid">flowchart TD
+    input[ModelUri string] --&gt; parse{ModelUri::parse}
+    parse --&gt;|hf://owner/repo| hf[HuggingFace variant]
+    parse --&gt;|https://...| url[Url variant]
+    parse --&gt;|known id| reg[Registry variant]
+    parse --&gt;|anything else| local[LocalPath variant]
+    hf --&gt; fetcher[Fetcher::resolve_to_path]
+    url --&gt; fetcher
+    reg --&gt; fetcher
+    local --&gt;|already on disk| done[PathBuf]
+    fetcher --&gt; cache{ModelCache hit?}
+    cache --&gt;|yes| done
+    cache --&gt;|no| download[HTTP GET via ureq]
+    download --&gt; verify[SHA-256 verify]
+    verify --&gt;|mismatch| err[HubError::Sha256Mismatch]
+    verify --&gt;|ok| store[store_atomic: write + rename]
+    store --&gt; done
+</code></pre>
+<h2 id="content-addressed-storage"><a class="header" href="#content-addressed-storage">Content-addressed storage</a></h2>
+<p>Every blob is stored at <code>&lt;cache_root&gt;/&lt;sha256[0..2]&gt;/&lt;sha256&gt;</code>, following Git's fanout layout. This means:</p>
+<ul>
+<li><strong>Deduplication is automatic.</strong> Two URIs pointing to the same model bytes share one cache entry.</li>
+<li><strong>Integrity is guaranteed.</strong> <code>store_atomic</code> verifies the SHA-256 digest before the rename; a partial download can never enter the cache.</li>
+<li><strong>Eviction is safe.</strong> Removing the file at its canonical path is the only operation needed; no index to update.</li>
+</ul>
+<p>The default cache root is <code>~/Library/Caches/airml/models</code> on macOS and <code>~/.cache/airml/models</code> on Linux, following the XDG base directory spec via the <code>dirs</code> crate.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="deployment-overview"><a class="header" href="#deployment-overview">Deployment overview</a></h1>
+<p>airML ships as a single native binary with no runtime dependencies beyond the ONNX Runtime dylib. This makes it easy to deploy in containers, on bare metal, or as a serverless function.</p>
+<h2 id="deployment-options"><a class="header" href="#deployment-options">Deployment options</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Method</th><th>Best for</th><th>Guide</th></tr></thead><tbody>
+<tr><td>Docker</td><td>Containerised workloads, Compose stacks</td><td><a href="deployment/docker.html">Docker</a></td></tr>
+<tr><td>systemd</td><td>Bare-metal Linux servers</td><td><a href="deployment/systemd.html">systemd</a></td></tr>
+<tr><td>AWS Lambda ARM</td><td>Serverless inference</td><td><a href="deployment/lambda.html">Lambda</a></td></tr>
+<tr><td>Homebrew</td><td>macOS developer machines</td><td><a href="deployment/homebrew.html">Homebrew</a></td></tr>
+</tbody></table>
+</div>
+<h2 id="common-requirements"><a class="header" href="#common-requirements">Common requirements</a></h2>
+<p>All deployment methods require:</p>
+<ol>
+<li>The <code>airml</code> binary</li>
+<li>The ONNX Runtime shared library (<code>libonnxruntime.so</code> / <code>libonnxruntime.dylib</code>)</li>
+<li><code>ORT_DYLIB_PATH</code> environment variable pointing to the dylib</li>
+<li>A model cache directory (default <code>~/.cache/airml</code>, override with <code>--cache-dir</code> or <code>AIRML_CACHE_DIR</code>)</li>
+</ol>
+<h2 id="production-checklist"><a class="header" href="#production-checklist">Production checklist</a></h2>
+<ul>
+<li>Set <code>--log-format json</code> for structured logging</li>
+<li>Set <code>--auth-token</code> on <code>/v1/*</code> routes if exposing to the network</li>
+<li>Put a reverse proxy (nginx, Caddy) in front for TLS termination</li>
+<li>Mount the model cache as a persistent volume (Docker) or named directory (systemd)</li>
+<li>Scrape <code>/metrics</code> with Prometheus — see <a href="deployment/../operations/observability.html">Observability</a></li>
+</ul>
+<h2 id="full-deployment-guide"><a class="header" href="#full-deployment-guide">Full deployment guide</a></h2>
+<p>The canonical deployment documentation lives at <a href="https://github.com/rlaope/airML/blob/master/docs/DEPLOYMENT.md"><code>docs/DEPLOYMENT.md</code></a> in the repository.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="docker"><a class="header" href="#docker">Docker</a></h1>
+<p>airML ships an official Docker image at <code>airml/airml</code>. Both <code>linux/amd64</code> and <code>linux/arm64</code> (Graviton/Ampere) are supported.</p>
+<h2 id="one-off-inference"><a class="header" href="#one-off-inference">One-off inference</a></h2>
+<pre><code class="language-bash">docker run --rm \
+  -v "$HOME/.cache/airml:/root/.cache/airml" \
+  airml/airml:0.2 \
+  run -m bge-small-en --input "Hello, world."
+</code></pre>
+<h2 id="http-inference-server"><a class="header" href="#http-inference-server">HTTP inference server</a></h2>
+<pre><code class="language-bash">docker run -d \
+  --name airml \
+  -p 8080:8080 \
+  -v airml-cache:/root/.cache/airml \
+  airml/airml:0.2 \
+  serve --bind 0.0.0.0:8080
+</code></pre>
+<h2 id="docker-compose-with-nginx"><a class="header" href="#docker-compose-with-nginx">Docker Compose (with nginx)</a></h2>
+<p>The <code>docker/docker-compose.yml</code> starts airML behind nginx on port 80:</p>
+<pre><code class="language-bash">docker compose -f docker/docker-compose.yml up -d
+
+# Check logs
+docker compose -f docker/docker-compose.yml logs -f airml
+</code></pre>
+<p>nginx proxies <code>http://localhost/</code> to <code>airml:8080</code>, passes the <code>Authorization</code> header through, and allows up to 10 MB request bodies.</p>
+<h2 id="building-from-source"><a class="header" href="#building-from-source">Building from source</a></h2>
+<pre><code class="language-bash"># Current architecture
+docker build -t airml/airml:local .
+
+# Multi-arch (push to registry)
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  -t airml/airml:0.2 \
+  --push .
+</code></pre>
+<h2 id="scratch-image"><a class="header" href="#scratch-image">Scratch image</a></h2>
+<p>A minimal scratch-based Dockerfile lives at <code>docker/scratch.Dockerfile</code>. It produces the smallest possible image by copying only the binary and dylib.</p>
+<h2 id="environment-variables"><a class="header" href="#environment-variables">Environment variables</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Variable</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>ORT_DYLIB_PATH</code></td><td>Path to <code>libonnxruntime.so</code> inside the container</td></tr>
+<tr><td><code>AIRML_CACHE_DIR</code></td><td>Model cache directory (mount as a volume)</td></tr>
+<tr><td><code>RUST_LOG</code></td><td>Log level/filter</td></tr>
+</tbody></table>
+</div>
+<h2 id="see-also-16"><a class="header" href="#see-also-16">See also</a></h2>
+<ul>
+<li><a href="deployment/overview.html">Deployment overview</a></li>
+<li><a href="deployment/../operations/observability.html">Observability</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="systemd"><a class="header" href="#systemd">systemd</a></h1>
+<p>The recommended deployment method for bare-metal Linux servers (Debian, Ubuntu, RHEL, and derivatives).</p>
+<h2 id="1-install-the-binary"><a class="header" href="#1-install-the-binary">1. Install the binary</a></h2>
+<pre><code class="language-bash">curl -L https://github.com/rlaope/airML/releases/latest/download/airml-linux-x86_64.tar.gz \
+  | tar xz
+sudo install -m 755 airml /usr/local/bin/airml
+</code></pre>
+<p>For ARM64 (Graviton/Ampere), use <code>airml-linux-aarch64.tar.gz</code>.</p>
+<h2 id="2-install-onnx-runtime"><a class="header" href="#2-install-onnx-runtime">2. Install ONNX Runtime</a></h2>
+<pre><code class="language-bash">sudo airml install-runtime
+</code></pre>
+<p>Note the printed <code>ORT_DYLIB_PATH</code> — you will need it in the service file.</p>
+<h2 id="3-run-the-installer-script"><a class="header" href="#3-run-the-installer-script">3. Run the installer script</a></h2>
+<pre><code class="language-bash">sudo bash deploy/install-systemd.sh
+</code></pre>
+<p>This script:</p>
+<ul>
+<li>Creates a <code>airml</code> system user</li>
+<li>Installs <code>deploy/airml.service</code> to <code>/etc/systemd/system/</code></li>
+<li>Enables and starts the service</li>
+</ul>
+<h2 id="4-verify"><a class="header" href="#4-verify">4. Verify</a></h2>
+<pre><code class="language-bash">systemctl status airml
+curl http://127.0.0.1:8080/healthz
+</code></pre>
+<h2 id="service-file-reference"><a class="header" href="#service-file-reference">Service file reference</a></h2>
+<pre><code class="language-ini">[Unit]
+Description=airML inference server
+After=network.target
+
+[Service]
+User=airml
+ExecStart=/usr/local/bin/airml serve --bind 127.0.0.1:8080 --log-format json
+Environment=ORT_DYLIB_PATH=/usr/local/lib/libonnxruntime.so
+Environment=AIRML_CACHE_DIR=/var/cache/airml
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+<p>The full unit file is at <code>deploy/airml.service</code>.</p>
+<h2 id="uninstall"><a class="header" href="#uninstall">Uninstall</a></h2>
+<pre><code class="language-bash">sudo systemctl stop airml
+sudo systemctl disable airml
+sudo rm /etc/systemd/system/airml.service
+sudo systemctl daemon-reload
+sudo userdel airml
+</code></pre>
+<h2 id="see-also-17"><a class="header" href="#see-also-17">See also</a></h2>
+<ul>
+<li><a href="deployment/overview.html">Deployment overview</a></li>
+<li><a href="deployment/../operations/observability.html">Observability</a> — logging and metrics</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="aws-lambda-arm"><a class="header" href="#aws-lambda-arm">AWS Lambda ARM</a></h1>
+<p>airML runs on Lambda ARM64 (<code>arm64</code> architecture, mapped to <code>aarch64-unknown-linux-gnu</code>). The key constraint is that Lambda's filesystem is read-only except for <code>/tmp</code>.</p>
+<h2 id="setup"><a class="header" href="#setup">Setup</a></h2>
+<ol>
+<li>Use the <code>airml-linux-aarch64.tar.gz</code> release tarball.</li>
+<li>Bundle <code>libonnxruntime.so</code> in a Lambda layer or copy it to <code>/tmp</code> at cold start.</li>
+<li>Set <code>ORT_DYLIB_PATH</code> to point into <code>/tmp</code> where you copied the dylib.</li>
+<li>Set <code>AIRML_CACHE_DIR=/tmp/airml</code> so the model cache lands in <code>/tmp</code>.</li>
+</ol>
+<h2 id="example-bootstrap-script"><a class="header" href="#example-bootstrap-script">Example bootstrap script</a></h2>
+<pre><code class="language-bash">#!/usr/bin/env bash
+# bootstrap (Lambda custom runtime)
+set -euo pipefail
+
+# Copy ORT from Lambda layer on first invocation
+if [[ ! -f /tmp/libonnxruntime.so ]]; then
+  cp /opt/lib/libonnxruntime.so /tmp/libonnxruntime.so
+fi
+
+export ORT_DYLIB_PATH=/tmp/libonnxruntime.so
+export AIRML_CACHE_DIR=/tmp/airml
+
+while true; do
+  EVENT=$(curl -sf \
+    "http://${AWS_LAMBDA_RUNTIME_API}/2018-06-01/runtime/invocation/next")
+  REQUEST_ID=$(curl -sI \
+    "http://${AWS_LAMBDA_RUNTIME_API}/2018-06-01/runtime/invocation/next" \
+    | grep -i lambda-runtime-aws-request-id \
+    | awk '{print $2}' | tr -d '\r')
+
+  RESULT=$(airml embed \
+    --cache-dir /tmp/airml \
+    --input "$(echo "${EVENT}" | jq -r '.text')")
+
+  curl -sf -X POST \
+    "http://${AWS_LAMBDA_RUNTIME_API}/2018-06-01/runtime/invocation/${REQUEST_ID}/response" \
+    -d "${RESULT}"
+done
+</code></pre>
+<h2 id="constraints"><a class="header" href="#constraints">Constraints</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Constraint</th><th>Value</th><th>Notes</th></tr></thead><tbody>
+<tr><td><code>/tmp</code> size</td><td>512 MB – 10 GB</td><td>Configure in function settings</td></tr>
+<tr><td>Min memory</td><td>512 MB</td><td>Recommended for model load</td></tr>
+<tr><td>Cold start</td><td>200–800ms</td><td>At 1 GB memory, ORT + model load</td></tr>
+<tr><td>Architecture</td><td><code>arm64</code></td><td>Use <code>aarch64</code> release tarball</td></tr>
+</tbody></table>
+</div>
+<h2 id="inference-command"><a class="header" href="#inference-command">Inference command</a></h2>
+<pre><code class="language-bash">airml run -m bge-small-en \
+  --cache-dir /tmp/airml \
+  --input "Hello from Lambda"
+</code></pre>
+<h2 id="cloudflare-workers"><a class="header" href="#cloudflare-workers">Cloudflare Workers</a></h2>
+<p><strong>Not currently supported.</strong> Workers run in V8 isolates without POSIX filesystem access. See <a href="deployment/../roadmap.html">Roadmap</a> for v0.6 status.</p>
+<h2 id="see-also-18"><a class="header" href="#see-also-18">See also</a></h2>
+<ul>
+<li><a href="deployment/overview.html">Deployment overview</a></li>
+<li><a href="deployment/docker.html">Docker</a> — for ECS / Fargate on ARM</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="homebrew"><a class="header" href="#homebrew">Homebrew</a></h1>
+<p>Homebrew installation is the recommended path for macOS developer machines.</p>
+<h2 id="status-1"><a class="header" href="#status-1">Status</a></h2>
+<p>The official tap is not yet published. Once available at <code>airml/homebrew-airml</code>:</p>
+<pre><code class="language-bash">brew tap airml/airml https://github.com/airml/homebrew-airml
+brew install airml
+</code></pre>
+<p>ONNX Runtime is not bundled in the Homebrew bottle. Run after install:</p>
+<pre><code class="language-bash">airml install-runtime
+</code></pre>
+<h2 id="tap-formula"><a class="header" href="#tap-formula">Tap formula</a></h2>
+<p>The formula lives at <code>Formula/airml.rb</code> in the repository. SHA256 values are automatically updated by <code>.github/workflows/release.yml</code> on every tagged release — maintainers do not need to update them manually.</p>
+<h2 id="until-the-tap-is-published"><a class="header" href="#until-the-tap-is-published">Until the tap is published</a></h2>
+<p>Use the pre-built binary:</p>
+<pre><code class="language-bash">curl -L https://github.com/rlaope/airML/releases/latest/download/airml-macos-aarch64.tar.gz | tar xz
+sudo mv airml /usr/local/bin/
+airml install-runtime
+</code></pre>
+<p>Or install from source:</p>
+<pre><code class="language-bash">cargo install --git https://github.com/rlaope/airML
+</code></pre>
+<h2 id="see-also-19"><a class="header" href="#see-also-19">See also</a></h2>
+<ul>
+<li><a href="deployment/../getting-started/installation.html">Installation</a></li>
+<li><a href="deployment/overview.html">Deployment overview</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="observability-1"><a class="header" href="#observability-1">Observability</a></h1>
+<p>airML emits structured logs via <code>tracing</code> and Prometheus metrics for all inference calls.</p>
+<h2 id="logs"><a class="header" href="#logs">Logs</a></h2>
+<p>By default, logs print to stderr in human-readable text format. For production use JSON:</p>
+<pre><code class="language-bash">airml --log-format=json --log-level=info serve
+</code></pre>
+<p>Override the level via <code>RUST_LOG</code> (takes precedence over <code>--log-level</code>):</p>
+<pre><code class="language-bash">RUST_LOG=airml_core=debug,airml_hub=info airml run -m bge-small-en --input "hi"
+</code></pre>
+<h3 id="log-flags"><a class="header" href="#log-flags">Log flags</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>--log-format</code></td><td><code>text</code></td><td><code>text</code> (human-readable) or <code>json</code> (structured)</td></tr>
+<tr><td><code>--log-level</code></td><td><code>info</code></td><td><code>trace</code>, <code>debug</code>, <code>info</code>, <code>warn</code>, or <code>error</code></td></tr>
+</tbody></table>
+</div>
+<p>Both flags are global and must be placed before any subcommand.</p>
+<h2 id="metrics"><a class="header" href="#metrics">Metrics</a></h2>
+<p>When <code>airml serve</code> is running, Prometheus metrics are exposed at:</p>
+<pre><code>GET http://localhost:8080/metrics
+</code></pre>
+<p>Format: Prometheus text exposition format 0.0.4.</p>
+<div class="table-wrapper"><table><thead><tr><th>Metric</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>airml_inference_total</code></td><td>counter</td><td>Total inference calls</td></tr>
+<tr><td><code>airml_inference_latency_seconds</code></td><td>histogram</td><td>Per-call inference latency</td></tr>
+<tr><td><code>airml_model_load_seconds</code></td><td>histogram</td><td>Model load time</td></tr>
+</tbody></table>
+</div>
+<h3 id="prometheus-scrape-config"><a class="header" href="#prometheus-scrape-config">Prometheus scrape config</a></h3>
+<pre><code class="language-yaml">scrape_configs:
+  - job_name: airml
+    static_configs:
+      - targets: ['localhost:8080']
+</code></pre>
+<h2 id="grafana-dashboard"><a class="header" href="#grafana-dashboard">Grafana dashboard</a></h2>
+<p>A starter dashboard JSON ships at <code>deploy/grafana-dashboard.json</code>.</p>
+<p>Import via <strong>Dashboards → Import → Upload JSON file</strong> in Grafana 11+. It covers all three metrics with stat panels (totals) and time series (latency histograms).</p>
+<h2 id="see-also-20"><a class="header" href="#see-also-20">See also</a></h2>
+<ul>
+<li><a href="operations/stability.html">Stability</a></li>
+<li><a href="operations/../cli/serve.html"><code>airml serve</code></a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="stability-1"><a class="header" href="#stability-1">Stability</a></h1>
+<h2 id="versioning-policy"><a class="header" href="#versioning-policy">Versioning policy</a></h2>
+<p>airML follows semver from v1.0 onwards. Until then:</p>
+<ul>
+<li><strong>Minor versions</strong> (0.2 → 0.3) may include public API breakage.</li>
+<li><strong>Patch versions</strong> (0.2.0 → 0.2.1) will not include breaking changes.</li>
+</ul>
+<p>Public APIs are tracked via <code>cargo public-api</code>. The CI job <code>.github/workflows/public-api.yml</code> runs on every PR and reports any surface changes. The check is informational until v1.0, at which point it becomes a hard gate.</p>
+<p>Internal modules under <code>crates/*/src/</code> are not public unless re-exported in <code>lib.rs</code>.</p>
+<h2 id="hardened-parsers"><a class="header" href="#hardened-parsers">Hardened parsers</a></h2>
+<p>The ONNX graph parser at <code>crates/airml-tune/src/graph_parser.rs</code> is fuzz-tested nightly via <code>cargo-fuzz</code>. The fuzz target <code>graph_parser</code> runs against <code>airml_tune::histogram_from_bytes</code> for 20 minutes per night.</p>
+<p>Run locally:</p>
+<pre><code class="language-bash"># Requires nightly Rust
+cargo +nightly fuzz run graph_parser
+</code></pre>
+<p>See <code>fuzz/README.md</code> for full instructions.</p>
+<h2 id="reporting-issues"><a class="header" href="#reporting-issues">Reporting issues</a></h2>
+<p>File a GitHub issue with reproduction steps. <strong>Crash bugs in the ONNX parser are treated as security issues</strong> — please email the maintainers privately before filing a public issue.</p>
+<h2 id="stable-crates-post-v10"><a class="header" href="#stable-crates-post-v10">Stable crates (post v1.0)</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Crate</th><th>Semver stable</th></tr></thead><tbody>
+<tr><td><code>airml-core</code></td><td>v1.0+</td></tr>
+<tr><td><code>airml-embed</code></td><td>v1.0+</td></tr>
+<tr><td><code>airml-providers</code></td><td>v1.0+</td></tr>
+<tr><td><code>airml-preprocess</code></td><td>v1.0+</td></tr>
+<tr><td><code>airml-tune</code></td><td>v1.0+ (internal APIs excluded)</td></tr>
+<tr><td><code>airml-hub</code></td><td>v1.0+</td></tr>
+<tr><td><code>airml-bench</code></td><td>v1.0+</td></tr>
+</tbody></table>
+</div>
+<h2 id="see-also-21"><a class="header" href="#see-also-21">See also</a></h2>
+<ul>
+<li><a href="operations/observability.html">Observability</a></li>
+<li><a href="operations/../roadmap.html">Roadmap</a> — v1.0 milestone details</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="performance"><a class="header" href="#performance">Performance</a></h1>
+<h2 id="benchmark-methodology"><a class="header" href="#benchmark-methodology">Benchmark methodology</a></h2>
+<p>Reproducible benchmarks live under <code>crates/airml-bench/</code>. Run them with:</p>
+<pre><code class="language-bash">cargo bench -p airml-bench
+</code></pre>
+<p>Numbers below come from <code>cargo bench -p airml-bench</code> on M2 Pro / macOS 14. Inputs are pseudo-Gaussian synthetic tensors (CLT-based) to avoid artificially cacheable patterns.</p>
+<h2 id="latency-table"><a class="header" href="#latency-table">Latency table</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Provider</th><th>Model</th><th>P50</th><th>P95</th></tr></thead><tbody>
+<tr><td>CPU</td><td>ResNet50</td><td>—</td><td>—</td></tr>
+<tr><td>CoreML (All)</td><td>ResNet50</td><td>—</td><td>—</td></tr>
+<tr><td>Neural Engine</td><td>ResNet50</td><td>—</td><td>—</td></tr>
+</tbody></table>
+</div>
+<blockquote>
+<p>Help wanted: run <code>cargo bench -p airml-bench</code> on your hardware and PR results to <code>bench/results/</code>.</p>
+</blockquote>
+<h2 id="cold-start-comparison"><a class="header" href="#cold-start-comparison">Cold start comparison</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Metric</th><th>airML</th><th>Python (PyTorch)</th></tr></thead><tbody>
+<tr><td>Binary size</td><td>~50 MB</td><td>~2 GB</td></tr>
+<tr><td>Cold start</td><td>0.01–0.05s</td><td>2–5s</td></tr>
+<tr><td>Memory usage</td><td>~100 MB</td><td>~500 MB+</td></tr>
+</tbody></table>
+</div>
+<h2 id="provider-selection-impact"><a class="header" href="#provider-selection-impact">Provider selection impact</a></h2>
+<p>Choosing the wrong CoreML compute units can cost 2-5x latency. The auto-tuner eliminates this guesswork — see <a href="operations/../apple-silicon/auto-tuner.html">Auto-tuner overview</a>.</p>
+<h2 id="submitting-benchmark-results"><a class="header" href="#submitting-benchmark-results">Submitting benchmark results</a></h2>
+<pre><code class="language-bash">cargo bench -p airml-bench 2&gt;&amp;1 \
+  | tee bench/results/$(uname -m)-$(sw_vers -productVersion 2&gt;/dev/null || uname -r).txt
+git add bench/results/
+git commit -m "bench: add results from &lt;your hardware&gt;"
+</code></pre>
+<p>Open a PR. All hardware contributions are welcome.</p>
+<h2 id="see-also-22"><a class="header" href="#see-also-22">See also</a></h2>
+<ul>
+<li><a href="operations/../crates/airml-bench.html">airml-bench crate</a></li>
+<li><a href="operations/../cli/bench.html"><code>airml bench</code> CLI</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="how-to-contribute"><a class="header" href="#how-to-contribute">How to contribute</a></h1>
+<p>We welcome:</p>
+<ul>
+<li>New benchmark results from your hardware (<code>crates/airml-bench/</code>)</li>
+<li>Curated model registry additions (<code>crates/airml-hub/src/registry.rs</code>)</li>
+<li>Bug reports with reproducible test cases</li>
+<li>Documentation improvements</li>
+</ul>
+<p>Please check <a href="roadmap.html">ROADMAP.md</a> to see if your idea is in scope. Anti-goals are listed in <a href="reference/anti-goals.html">reference/anti-goals.md</a>.</p>
+<h2 id="local-development"><a class="header" href="#local-development">Local development</a></h2>
+<pre><code class="language-bash">cargo build
+cargo test
+cargo clippy --all-targets
+</code></pre>
+<p>For the full feature set:</p>
+<pre><code class="language-bash">cargo build --features coreml,nlp
+cargo test --workspace --features coreml,nlp
+cargo clippy --workspace --all-targets --features coreml,nlp -- -D warnings
+</code></pre>
+<h2 id="coding-style"><a class="header" href="#coding-style">Coding style</a></h2>
+<ul>
+<li>Follow <code>cargo fmt</code> defaults.</li>
+<li>All public items documented with <code>///</code>.</li>
+<li>No <code>unwrap()</code> in production paths — use <code>Result</code> and <code>?</code>.</li>
+<li>Errors via <code>thiserror</code> for crates, <code>anyhow</code> for binaries and examples.</li>
+</ul>
+<h2 id="fuzzing"><a class="header" href="#fuzzing">Fuzzing</a></h2>
+<p>Fuzz targets live in <code>fuzz/</code>. See <code>fuzz/README.md</code> for instructions on running locally with <code>cargo-fuzz</code>. The nightly CI job (<code>.github/workflows/fuzz.yml</code>) runs <code>graph_parser</code> for 20 minutes against <code>airml_tune::histogram_from_bytes</code>.</p>
+<pre><code class="language-bash"># Requires nightly Rust
+cargo +nightly fuzz run graph_parser
+</code></pre>
+<h2 id="submitting"><a class="header" href="#submitting">Submitting</a></h2>
+<p>Open a PR against <code>master</code>. CI runs build + clippy on macOS arm64, macOS x86_64, Linux arm64, and Linux x86_64.</p>
+<h2 id="see-also-23"><a class="header" href="#see-also-23">See also</a></h2>
+<ul>
+<li><a href="roadmap.html">Roadmap</a></li>
+<li><a href="releasing.html">Releasing</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="roadmap-1"><a class="header" href="#roadmap-1">Roadmap</a></h1>
+<blockquote>
+<p>Versions, not weeks. We ship when each milestone is done.</p>
+</blockquote>
+<h2 id="v02--foundations-of-the-moat-current"><a class="header" href="#v02--foundations-of-the-moat-current">v0.2 — Foundations of the moat (current)</a></h2>
+<ul>
+<li><input disabled="" type="checkbox" checked=""/>
+<code>airml-bench</code> — criterion-based benchmark crate</li>
+<li><input disabled="" type="checkbox" checked=""/>
+<code>airml-tune</code> — <code>BackendOracle</code> for automatic backend selection</li>
+<li><input disabled="" type="checkbox" checked=""/>
+<code>airml-hub</code> — content-addressed model cache, HF download</li>
+<li><input disabled="" type="checkbox" checked=""/>
+<code>airml install-runtime</code> — one-command ORT setup</li>
+<li><input disabled="" type="checkbox" checked=""/>
+<code>airml pull &lt;model&gt;</code> — cache models by ID, URI, or URL</li>
+<li><input disabled="" type="checkbox" checked=""/>
+<code>examples/</code> — runnable examples</li>
+<li><input disabled="" type="checkbox" checked=""/>
+<code>--provider auto</code> rewired to <code>BackendOracle</code></li>
+<li><input disabled="" type="checkbox" checked=""/>
+Realistic input distribution in <code>bench</code> (pseudo-Gaussian)</li>
+<li><input disabled="" type="checkbox"/>
+First public benchmark numbers on M2/M3</li>
+<li><input disabled="" type="checkbox"/>
+20+ unit tests across all crates</li>
+</ul>
+<h2 id="v03--llm-generation"><a class="header" href="#v03--llm-generation">v0.3 — LLM generation</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"/>
+<code>IoBinding</code> integration in <code>airml-core</code> to eliminate per-call allocation</li>
+<li><input disabled="" type="checkbox"/>
+KV-cache management module</li>
+<li><input disabled="" type="checkbox"/>
+<code>airml generate</code> — real autoregressive text generation</li>
+<li><input disabled="" type="checkbox"/>
+INT4/INT8 quantization passthrough</li>
+<li><input disabled="" type="checkbox"/>
+First curated LLM in registry: <code>llama-3.2-1b-int4</code></li>
+<li><input disabled="" type="checkbox"/>
+Target: ≥30 tok/s on M2 Pro for 1B INT4</li>
+</ul>
+<h2 id="v04--real-graph-profiling"><a class="header" href="#v04--real-graph-profiling">v0.4 — Real graph profiling</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"/>
+ONNX graph parser inside <code>airml-tune</code></li>
+<li><input disabled="" type="checkbox"/>
+Op-histogram-based dispatch (not just family heuristics)</li>
+<li><input disabled="" type="checkbox"/>
+Per-op latency profiling cache (informs future <code>recommend()</code> calls)</li>
+<li><input disabled="" type="checkbox"/>
+<code>airml profile &lt;model&gt;</code> — generate a per-op timing report</li>
+</ul>
+<h2 id="v05--deployment-surface"><a class="header" href="#v05--deployment-surface">v0.5 — Deployment surface</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"/>
+<code>airml serve</code> — HTTP daemon with OpenAI-compatible embeddings API</li>
+<li><input disabled="" type="checkbox"/>
+Linux ARM (Graviton/Ampere) first-class support</li>
+<li><input disabled="" type="checkbox"/>
+Docker scratch image template</li>
+<li><input disabled="" type="checkbox"/>
+systemd unit template</li>
+</ul>
+<h2 id="v06--public-benchmark-site"><a class="header" href="#v06--public-benchmark-site">v0.6 — Public benchmark site</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"/>
+<code>benchmarks.airml.dev</code> (CI-published static site)</li>
+<li><input disabled="" type="checkbox"/>
+Comparison vs <code>ort</code> direct, <code>candle</code>, <code>tract</code>, <code>python+onnxruntime</code>, <code>mlx</code></li>
+<li><input disabled="" type="checkbox"/>
+"Where do you want to ship from?" cold-start vs P50 scatter plot</li>
+</ul>
+<h2 id="v10--stability"><a class="header" href="#v10--stability">v1.0 — Stability</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"/>
+Migrate to <code>ort</code> 2.0 stable</li>
+<li><input disabled="" type="checkbox"/>
+Semver-stable public API (<code>airml-core</code>, <code>airml-embed</code>)</li>
+<li><input disabled="" type="checkbox"/>
+<code>cargo public-api</code> enforcement in CI (hard gate)</li>
+<li><input disabled="" type="checkbox"/>
+Fuzz tests on ONNX parser surface (nightly)</li>
+</ul>
+<h2 id="anti-goals-wont-do"><a class="header" href="#anti-goals-wont-do">Anti-goals (won't do)</a></h2>
+<p>See <a href="reference/anti-goals.html">Anti-goals</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="releasing"><a class="header" href="#releasing">Releasing</a></h1>
+<h2 id="pre-release-checklist"><a class="header" href="#pre-release-checklist">Pre-release checklist</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"/>
+<code>cargo test --workspace --features=coreml,nlp</code> passes</li>
+<li><input disabled="" type="checkbox"/>
+<code>cargo clippy --workspace --all-targets --features=coreml,nlp -- -D warnings</code> passes</li>
+<li><input disabled="" type="checkbox"/>
+<code>cargo public-api diff</code> reviewed for breaking changes</li>
+<li><input disabled="" type="checkbox"/>
+<code>CHANGELOG.md</code> updated</li>
+<li><input disabled="" type="checkbox"/>
+Version bumped in root + all member <code>Cargo.toml</code>s</li>
+<li><input disabled="" type="checkbox"/>
+<code>bench/results/</code> updated with current numbers (optional)</li>
+</ul>
+<h2 id="release-order"><a class="header" href="#release-order">Release order</a></h2>
+<p>Member crates must be published first since they depend on each other:</p>
+<ol>
+<li><code>cargo publish -p airml-core</code></li>
+<li><code>cargo publish -p airml-providers</code></li>
+<li><code>cargo publish -p airml-preprocess</code></li>
+<li><code>cargo publish -p airml-embed</code></li>
+<li><code>cargo publish -p airml-tune</code> (depends on airml-core)</li>
+<li><code>cargo publish -p airml-hub</code> (independent)</li>
+<li><code>cargo publish -p airml-bench</code> (depends on airml-core, airml-providers)</li>
+<li><code>cargo publish</code> (root binary)</li>
+</ol>
+<h2 id="post-release"><a class="header" href="#post-release">Post-release</a></h2>
+<pre><code class="language-bash">git tag v{version}
+git push --tags
+</code></pre>
+<p>Pushing the tag triggers <code>.github/workflows/release.yml</code>, which:</p>
+<ul>
+<li>Builds release binaries for all platforms</li>
+<li>Creates a GitHub release with the tarballs</li>
+<li>Updates SHA256 values in <code>Formula/airml.rb</code></li>
+</ul>
+<h2 id="see-also-24"><a class="header" href="#see-also-24">See also</a></h2>
+<ul>
+<li><a href="changelog.html">Changelog</a></li>
+<li><a href="contributing.html">Contributing</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="changelog"><a class="header" href="#changelog">Changelog</a></h1>
+<p>All notable changes to airML are documented here.</p>
+<p>This project adheres to <a href="https://semver.org/">Semantic Versioning</a> from v1.0 onwards.</p>
+<h2 id="unreleased"><a class="header" href="#unreleased">[Unreleased]</a></h2>
+<h2 id="020--tbd"><a class="header" href="#020--tbd">[0.2.0] — TBD</a></h2>
+<h3 id="added"><a class="header" href="#added">Added</a></h3>
+<ul>
+<li><code>airml install-runtime</code> — auto-downloads ONNX Runtime dylib</li>
+<li><code>airml pull &lt;model&gt;</code> — fetches models from registry, HF, or URL with sha256 verification</li>
+<li><code>airml generate</code> — token-by-token LLM inference with KV cache reuse</li>
+<li><code>airml serve</code> — OpenAI-compatible HTTP embeddings API</li>
+<li><code>airml-tune</code> crate — <code>BackendOracle</code> automatically picks CoreML compute units</li>
+<li><code>airml-hub</code> crate — content-addressed model cache</li>
+<li><code>airml-bench</code> crate — criterion-based benchmark harness</li>
+<li>ONNX graph parser (hand-rolled protobuf, zero dependencies)</li>
+<li>4 runnable examples under <code>examples/</code></li>
+<li>Docker, systemd, and Homebrew packaging templates</li>
+<li>Nightly fuzz target on the ONNX parser</li>
+</ul>
+<h3 id="changed"><a class="header" href="#changed">Changed</a></h3>
+<ul>
+<li><code>--provider auto</code> now uses <code>BackendOracle::recommend_for_path</code> instead of always picking CoreML-All</li>
+<li>Synthetic input in <code>airml bench</code> replaced with pseudo-Gaussian (CLT-based)</li>
+<li>Workspace dependencies pinned to <code>ort = "=2.0.0-rc.11"</code> (rc.12 has a VitisAI EP regression)</li>
+</ul>
+<h3 id="fixed"><a class="header" href="#fixed">Fixed</a></h3>
+<ul>
+<li><code>airml-embed::embed_model!</code> macro now uses <code>LazyLock</code> for non-const construction</li>
+<li>ImageNet preprocessing channel order corrected to RGB</li>
+</ul>
+<h2 id="010"><a class="header" href="#010">[0.1.0]</a></h2>
+<p>Initial release.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="anti-goals"><a class="header" href="#anti-goals">Anti-goals</a></h1>
+<p>These are things airML explicitly does not do. Understanding what we won't build is as important as knowing what we will.</p>
+<ul>
+<li>
+<p><strong>We don't compete with <code>candle</code> on CUDA.</strong> If you need NVIDIA GPU inference, use <code>candle</code> or <code>ort</code> directly. airML's value is Apple Silicon and portable ONNX, not CUDA.</p>
+</li>
+<li>
+<p><strong>We don't train models.</strong> Use <code>burn</code>, <code>candle</code>, or Python frameworks for training. airML is inference-only.</p>
+</li>
+<li>
+<p><strong>We don't ship a Python binding.</strong> The whole point of airML is eliminating the Python runtime. A Python binding would contradict the project's core premise.</p>
+</li>
+<li>
+<p><strong>We don't host an iOS/Android SDK.</strong> airML targets server and desktop CLI deployments. Mobile is out of scope.</p>
+</li>
+<li>
+<p><strong>We don't expand the registry beyond ~20 curated models.</strong> Quality over quantity. Each registry model is tested, SHA256-pinned, and known to work with the auto-tuner. We are not a model hub.</p>
+</li>
+<li>
+<p><strong>We don't support Cloudflare Workers.</strong> Workers run in V8 isolates without POSIX filesystem access. airML is a native binary that links against <code>libonnxruntime.so</code> — incompatible with that environment. See <a href="reference/../roadmap.html">Roadmap</a> for v0.6 tracking.</p>
+</li>
+<li>
+<p><strong>We don't support Windows.</strong> macOS arm64, macOS x86_64, Linux arm64, and Linux x86_64 are the supported platforms. Windows support is not planned.</p>
+</li>
+</ul>
+<p>These constraints exist to keep the codebase small, the binary single, and the project focused. If you need any of the above, there are better tools for those jobs.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="glossary"><a class="header" href="#glossary">Glossary</a></h1>
+<p><strong>ANE</strong> — Apple Neural Engine. The dedicated machine-learning accelerator built into Apple Silicon chips (M1 and later). Provides high throughput for matrix operations at very low power. airML targets the ANE via CoreML's <code>CpuAndNeuralEngine</code> or <code>All</code> compute units.</p>
+<p><strong>BackendOracle</strong> — The decision engine in <code>airml-tune</code> that analyzes an ONNX model's op-histogram and recommends the optimal CoreML <code>ComputeUnits</code> setting. Replaces manual provider selection for most models.</p>
+<p><strong>BoundSession</strong> — An ONNX Runtime session with pre-allocated I/O buffers via <code>IoBinding</code>. Eliminates per-call tensor allocation. Planned for <code>airml-core</code> in v0.3.</p>
+<p><strong>ComputeUnits</strong> — The CoreML enum that controls which hardware executes a model: <code>All</code> (CPU + GPU + ANE), <code>CpuAndNeuralEngine</code>, <code>CpuAndGpu</code>, or <code>CpuOnly</code>. Choosing the wrong value can cost 2–5× latency.</p>
+<p><strong>EmbeddedModel</strong> — An ONNX model baked into a Rust binary via <code>include_bytes!</code>. Provided by the <code>airml-embed</code> crate. Makes deployment a single-file copy with no external model assets.</p>
+<p><strong>Fetcher</strong> — The download subsystem inside <code>airml-hub</code>. Resolves model URIs (registry id, <code>hf://</code> URI, or direct URL) to a local content-addressed path, verifying SHA256 on arrival.</p>
+<p><strong>IoBinding</strong> — An ONNX Runtime API for pinning input and output tensors to specific memory locations before running a session. Eliminates per-inference allocation overhead. Important for high-throughput serving and for LLM KV-cache reuse.</p>
+<p><strong>ModelFamily</strong> — The classification <code>BackendOracle</code> assigns to a model based on its op-histogram: vision (Conv-heavy), text-encoder-static, text-encoder-dynamic, dual-encoder, or language-model. Each family maps to a recommended <code>ComputeUnits</code>.</p>
+<p><strong>OpHistogram</strong> — A frequency map of ONNX operator types in a model graph (e.g., <code>{Conv: 53, Relu: 52, Gemm: 1}</code>). Computed by <code>airml-tune</code>'s hand-rolled protobuf parser. The histogram is the primary signal for <code>BackendOracle</code> classification.</p>
+<p><strong>ORT</strong> — ONNX Runtime. The inference engine from Microsoft that airML wraps. airML uses the Rust bindings crate <code>ort</code>. The current pinned version is <code>2.0.0-rc.11</code>.</p>
+<p><strong>Registry</strong> — The curated set of ~20 models built into <code>airml-hub</code>. Each entry maps a short id (e.g., <code>bge-small-en</code>) to a download URI and expected SHA256. Designed to stay small and well-tested rather than grow into a general model hub.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+    </div>
+    </body>
+</html>
