@@ -19,7 +19,7 @@ jobs:
           cargo +nightly fuzz run graph_parser -- -max_total_time=1200
       - name: Upload crashes
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: fuzz-crashes
           path: fuzz/artifacts/
