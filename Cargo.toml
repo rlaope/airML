@@ -105,7 +105,7 @@ thiserror = "2.0"
 anyhow = "1.0"
 
 # HTTP / IO / hashing (shared by hub + install)
-ureq = { version = "2.10", features = ["tls"] }
+ureq = { version = "3.3", features = ["tls"] }
 sha2 = "0.10"
 dirs = "5.0"
 hex = "0.4"
