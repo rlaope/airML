@@ -4,7 +4,7 @@
 #
 # For cross-arch builds use:
 #   docker buildx build --platform linux/amd64,linux/arm64 -t airml/airml:0.2 .
-FROM rust:1.82-slim-bookworm AS builder
+FROM rust:1.95-slim-bookworm AS builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     pkg-config \
