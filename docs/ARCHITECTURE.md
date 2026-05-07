@@ -2,6 +2,81 @@
 
 This document explains the internal architecture of airML.
 
+## Workspace Topology
+
+```mermaid
+graph TD
+    cli[airml CLI] --> core[airml-core]
+    cli --> hub[airml-hub]
+    cli --> tune[airml-tune]
+    cli --> preprocess[airml-preprocess]
+    cli --> embed[airml-embed]
+    cli --> bench[airml-bench]
+    tune --> core
+    embed --> core
+    bench --> core
+    bench --> providers[airml-providers]
+    core --> ort[ort 2.0.0-rc.11]
+    providers --> ort
+    preprocess -.-> tokenizers[tokenizers]
+    preprocess -.-> image_crate[image]
+```
+
+## Inference Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant CLI as airml CLI
+    participant Hub as airml-hub
+    participant Oracle as BackendOracle
+    participant Engine as InferenceEngine
+    participant ORT as ort / ONNX Runtime
+
+    User->>CLI: airml run -m hf://owner/repo --input img.jpg
+    CLI->>Hub: ModelUri::parse() → resolve_to_path()
+    Hub-->>CLI: /path/to/cached/model.onnx
+    CLI->>Oracle: recommend_for_path(model.onnx)
+    Oracle-->>CLI: BackendRecommendation (e.g. CoreMLAneOnly)
+    CLI->>Engine: InferenceEngine::from_file_with_config()
+    CLI->>Engine: engine.run(preprocessed_input)
+    Engine->>ORT: Session::run()
+    ORT-->>Engine: output tensors
+    Engine-->>CLI: Vec<OrtValue>
+    CLI-->>User: classification / embedding output
+```
+
+## Auto-Tuner Decision Tree
+
+```mermaid
+flowchart TD
+    A[ModelMetadata + ONNX graph bytes] --> B{Parse op histogram}
+    B -->|parse ok| C[OpHistogram: counts per op_type]
+    B -->|parse error / no file| D[Heuristic from input tensor names]
+    C --> E{dominant_class thresholds}
+    D --> F[infer_family from input names]
+    F --> G[infer_op_class from ModelFamily]
+    E -->|Conv > 30%| H[OpClass::ConvHeavy]
+    E -->|MatMul/Gemm > 40%| I[OpClass::GemmHeavy]
+    E -->|Attention > 20%| J[OpClass::AttentionHeavy]
+    E -->|ControlFlow > 5%| K[OpClass::ControlFlow]
+    E -->|fallback| L[OpClass::Mixed]
+    G --> M[ModelProfile]
+    H --> M
+    I --> M
+    J --> M
+    K --> M
+    L --> M
+    M --> N{BackendOracle::recommend}
+    N -->|Vision + ConvHeavy| O[CoreMLAneOnly]
+    N -->|TextEncoder + AttentionHeavy + static shapes| O
+    N -->|TextEncoder + AttentionHeavy + dynamic shapes| P[CoreMLAll]
+    N -->|ImageTextDual + Mixed| P
+    N -->|LanguageModel + ControlFlow| Q[CoreMLGpuOnly]
+    N -->|Unknown + dynamic| R[CpuOnlyWithReason]
+    N -->|catch-all| P
+```
+
 ## Overview
 
 airML is a lightweight ML inference runtime built in Rust. It provides a CLI for running ONNX models without Python dependencies.

@@ -1,0 +1,25 @@
+services:
+  airml:
+    image: airml/airml:0.2
+    command: ["serve", "--bind", "0.0.0.0:8080"]
+    volumes:
+      - airml-cache:/root/.cache/airml
+    expose:
+      - "8080"
+    restart: unless-stopped
+    environment:
+      - ORT_DYLIB_PATH=/usr/local/lib/libonnxruntime.so
+      - RUST_LOG=info
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - airml
+    restart: unless-stopped
+
+volumes:
+  airml-cache:

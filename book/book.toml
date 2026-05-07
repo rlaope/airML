@@ -1,0 +1,28 @@
+[book]
+title = "airML"
+description = "Run any ONNX model on Apple Silicon as a single binary"
+authors = ["airml contributors"]
+language = "en"
+multilingual = false
+src = "src"
+
+[output.html]
+default-theme = "ayu"
+preferred-dark-theme = "ayu"
+git-repository-url = "https://github.com/rlaope/airML"
+edit-url-template = "https://github.com/rlaope/airML/edit/master/book/{path}"
+no-section-label = true
+mathjax-support = false
+
+[output.html.fold]
+enable = true
+level = 0
+
+[output.html.search]
+enable = true
+limit-results = 30
+heading-split-level = 3
+
+[preprocessor.index]
+
+[preprocessor.links]

@@ -2,14 +2,22 @@
 name = "airml-core"
 version = "0.1.0"
 edition = "2021"
-description = "Core inference engine for airML"
+description = "Core ONNX inference engine powering the airML runtime"
 license = "MIT"
+repository = "https://github.com/airml/airml"
+homepage = "https://github.com/airml/airml"
+documentation = "https://docs.rs/airml-core"
+readme = "README.md"
+keywords = ["onnx", "inference", "ml", "runtime"]
+categories = ["science", "api-bindings"]
+rust-version = "1.80"
 
 [dependencies]
-ort = { workspace = true, features = ["load-dynamic"] }
+ort = { workspace = true, features = ["load-dynamic", "half"] }
 ndarray = { workspace = true }
 half = { workspace = true }
 thiserror = { workspace = true }
+tracing = "0.1"
 
 [dev-dependencies]
 anyhow = { workspace = true }

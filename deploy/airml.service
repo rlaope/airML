@@ -1,0 +1,24 @@
+[Unit]
+Description=airML inference server
+After=network.target
+
+[Service]
+Type=simple
+User=airml
+Group=airml
+ExecStart=/usr/local/bin/airml serve --bind 127.0.0.1:8080
+Restart=on-failure
+RestartSec=5
+Environment="ORT_DYLIB_PATH=/usr/local/lib/libonnxruntime.so"
+Environment="RUST_LOG=info"
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+StateDirectory=airml
+ReadWritePaths=/var/lib/airml
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!--
+    airML logo mark — chevron only, no wordmark.
+    Use for favicons, avatars, and square contexts.
+    Single color via currentColor.
+  -->
+
+  <!-- Chevron scaled to fill the square viewBox -->
+  <g fill="currentColor">
+    <!-- Left leg -->
+    <polygon points="20,160 52,160 100,60 68,60" />
+    <!-- Right leg -->
+    <polygon points="100,60 132,60 132,92 100,92" />
+    <!-- Top cap that closes the chevron into a solid V-shape -->
+    <polygon points="68,60 100,60 100,92 80,135 52,135" />
+  </g>
+</svg>

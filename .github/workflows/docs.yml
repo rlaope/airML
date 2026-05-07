@@ -1,0 +1,33 @@
+name: Build and deploy docs
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'book/**'
+      - 'docs/**'
+      - 'README.md'
+      - 'ROADMAP.md'
+      - 'CONTRIBUTING.md'
+      - 'CHANGELOG.md'
+      - '.github/workflows/docs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: peaceiris/actions-mdbook@v2
+        with:
+          mdbook-version: '0.4.40'
+      - run: cd book && mdbook build
+      - uses: peaceiris/actions-gh-pages@v4
+        if: github.ref == 'refs/heads/master'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./book/book
+          publish_branch: gh-pages
+          cname: ''

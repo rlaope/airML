@@ -1,6 +1,10 @@
 //! Bench command implementation
 //!
 //! Benchmarks model inference performance.
+//!
+//! Note: this is a quick-look harness. The real benchmark suite with
+//! criterion, warmup calibration, and HTML reports lives in the
+//! `airml-bench` crate.
 
 use std::time::{Duration, Instant};
 
@@ -16,18 +20,8 @@ pub fn execute(args: &BenchArgs) -> Result<()> {
     println!("Benchmark: {}", args.model.display());
     println!("{:=<60}", "");
 
-    // Configure session
-    let providers = match args.provider.as_str() {
-        "auto" => auto_select_providers(),
-        "cpu" => vec![airml_providers::CpuProvider::default().into_dispatch()],
-        #[cfg(feature = "coreml")]
-        "coreml" => vec![airml_providers::CoreMLProvider::default().into_dispatch()],
-        #[cfg(feature = "coreml")]
-        "neural-engine" => vec![airml_providers::CoreMLProvider::default()
-            .neural_engine_only()
-            .into_dispatch()],
-        _ => auto_select_providers(),
-    };
+    // Configure session — probe with CPU first to get metadata for BackendOracle.
+    let providers = select_bench_providers(args)?;
 
     let config = SessionConfig::new().with_providers(providers);
 
@@ -49,8 +43,8 @@ pub fn execute(args: &BenchArgs) -> Result<()> {
     println!("Input shape: {:?}", shape);
     println!();
 
-    // Create random input
-    let input = create_random_input(&shape);
+    // Create realistic pseudo-Gaussian input.
+    let input = realistic_input(&shape);
 
     // Warmup
     let mut engine = engine;
@@ -135,9 +129,96 @@ fn get_model_input_shape(engine: &InferenceEngine) -> Result<Vec<usize>> {
     Ok(shape)
 }
 
-fn create_random_input(shape: &[usize]) -> ArrayD<f32> {
+/// Build a provider list for benchmarking, consulting BackendOracle when `--provider auto`.
+fn select_bench_providers(
+    args: &BenchArgs,
+) -> Result<Vec<airml_providers::ExecutionProviderDispatch>> {
+    match args.provider.as_str() {
+        "auto" => {
+            #[cfg(feature = "coreml")]
+            {
+                let oracle = airml_tune::BackendOracle::new();
+
+                // Prefer graph-based classification for higher accuracy.
+                // Fall back to metadata heuristics if graph parsing fails
+                // (e.g. corrupt file, unsupported opset).
+                let rec = match oracle.recommend_for_path(&args.model) {
+                    Ok(graph_rec) => {
+                        // Patch with session metadata for family + dynamic shapes.
+                        let probe_config =
+                            SessionConfig::new().with_providers(auto_select_providers());
+                        if let Ok(probe) =
+                            InferenceEngine::from_file_with_config(&args.model, probe_config)
+                        {
+                            let mut profile =
+                                oracle.profile_from_metadata(probe.metadata());
+                            if let Ok(hist) = airml_tune::histogram_from_path(&args.model) {
+                                profile.dominant_op_class = hist.dominant_class();
+                            }
+                            oracle.recommend(&profile)
+                        } else {
+                            graph_rec
+                        }
+                    }
+                    Err(err) => {
+                        eprintln!(
+                            "[airml-tune] graph parse failed, falling back to metadata heuristics: {err}"
+                        );
+                        let probe_config =
+                            SessionConfig::new().with_providers(auto_select_providers());
+                        if let Ok(probe) =
+                            InferenceEngine::from_file_with_config(&args.model, probe_config)
+                        {
+                            oracle.recommend_for_metadata(probe.metadata())
+                        } else {
+                            return Ok(auto_select_providers());
+                        }
+                    }
+                };
+
+                let providers = airml_tune::dispatch::recommendation_to_providers(&rec);
+                eprintln!(
+                    "[airml-tune] selected backend: {:?} (model: {})",
+                    rec,
+                    args.model.file_name().unwrap_or_default().to_string_lossy()
+                );
+                return Ok(providers);
+            }
+            #[allow(unreachable_code)]
+            Ok(auto_select_providers())
+        }
+        "cpu" => Ok(vec![airml_providers::CpuProvider::default().into_dispatch()]),
+        #[cfg(feature = "coreml")]
+        "coreml" => Ok(vec![airml_providers::CoreMLProvider::default().into_dispatch()]),
+        #[cfg(feature = "coreml")]
+        "neural-engine" => Ok(vec![airml_providers::CoreMLProvider::default()
+            .neural_engine_only()
+            .into_dispatch()]),
+        _ => Ok(auto_select_providers()),
+    }
+}
+
+/// Generate pseudo-Gaussian data via the central limit theorem (sum of 12 uniforms − 6).
+///
+/// This produces more realistic activations than a ramp or uniform distribution,
+/// reducing the chance that synthetic inputs trigger degenerate fast-paths in
+/// quantised or sparse kernels.
+fn realistic_input(shape: &[usize]) -> ArrayD<f32> {
     let total: usize = shape.iter().product();
-    let data: Vec<f32> = (0..total).map(|i| (i as f32 * 0.001) % 1.0).collect();
+    let mut data = Vec::with_capacity(total);
+    // Splitmix64-style LCG — deterministic, no external deps.
+    let mut state: u64 = 0x9E3779B97F4A7C15;
+    for _ in 0..total {
+        let mut sum = 0.0_f32;
+        for _ in 0..12 {
+            state = state
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
+            let u = (state >> 32) as u32 as f32 / u32::MAX as f32;
+            sum += u;
+        }
+        data.push(sum - 6.0);
+    }
     ArrayD::from_shape_vec(IxDyn(shape), data).unwrap()
 }
 

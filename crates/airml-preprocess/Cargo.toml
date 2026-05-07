@@ -2,17 +2,26 @@
 name = "airml-preprocess"
 version = "0.1.0"
 edition = "2021"
-description = "Preprocessing module for airML"
+description = "Image and text preprocessing utilities for airML ONNX inference pipelines"
 license = "MIT"
+repository = "https://github.com/airml/airml"
+homepage = "https://github.com/airml/airml"
+documentation = "https://docs.rs/airml-preprocess"
+readme = "README.md"
+keywords = ["onnx", "preprocessing", "tokenizer", "image"]
+categories = ["science", "multimedia"]
+rust-version = "1.80"
 
 [dependencies]
 ndarray = { workspace = true }
 image = { workspace = true }
 thiserror = { workspace = true }
+anyhow = { workspace = true }
 
 # NLP (optional)
 tokenizers = { version = "0.21", optional = true }
+airml-core = { workspace = true, optional = true }
 
 [features]
 default = []
-nlp = ["dep:tokenizers"]
+nlp = ["dep:tokenizers", "dep:airml-core"]

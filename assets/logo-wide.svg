@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 100" fill="none">
+  <!--
+    airML logo — wide header variant (600x100).
+    Chevron mark on the left, large wordmark to the right.
+    Single color via currentColor.
+  -->
+
+  <!-- Chevron mark, scaled to fit 100px tall -->
+  <g fill="currentColor">
+    <!-- Left leg -->
+    <polygon points="8,82 22,82 46,24 32,24" />
+    <!-- Right leg -->
+    <polygon points="46,24 60,24 60,40 46,40" />
+    <!-- Top cap -->
+    <polygon points="32,24 46,24 46,40 38,60 22,60" />
+  </g>
+
+  <!-- Wordmark -->
+  <text
+    x="76"
+    y="72"
+    font-family="Menlo, 'SF Mono', Consolas, monospace"
+    font-size="60"
+    font-weight="700"
+    fill="currentColor"
+    letter-spacing="-2"
+  >airML</text>
+</svg>

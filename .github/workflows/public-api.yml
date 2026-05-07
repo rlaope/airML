@@ -1,0 +1,25 @@
+name: Public API check
+on:
+  pull_request:
+    paths:
+      - 'crates/**'
+      - 'src/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+
+jobs:
+  public-api:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo install cargo-public-api --locked --version 0.42
+      - name: Compare public API
+        run: |
+          for crate in airml-core airml-providers airml-preprocess airml-embed airml-bench airml-tune airml-hub; do
+            echo "=== $crate ==="
+            cargo public-api -p $crate --diff-git-checkouts master HEAD || echo "Diff for $crate (informational; no enforcement until v1.0)"
+          done

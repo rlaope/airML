@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*.*.*'
 
 env:
   CARGO_TERM_COLOR: always
@@ -16,62 +16,132 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: macos-latest
-            target: x86_64-apple-darwin
-            artifact: airml-macos-x86_64
-          - os: macos-latest
+          # macOS arm64 (native on macos-14)
+          - os: macos-14
             target: aarch64-apple-darwin
-            artifact: airml-macos-aarch64
-          - os: ubuntu-latest
+            features: coreml,nlp
+            artifact_stem: airml-macos-aarch64
+
+          # macOS x86_64 (cross-compiled from macos-14 arm64 runner)
+          - os: macos-14
+            target: x86_64-apple-darwin
+            features: coreml,nlp
+            artifact_stem: airml-macos-x86_64
+
+          # Linux x86_64 (native)
+          - os: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
-            artifact: airml-linux-x86_64
+            features: nlp
+            artifact_stem: airml-linux-x86_64
+
+          # Linux arm64 (cross-compiled via cross)
+          - os: ubuntu-22.04
+            target: aarch64-unknown-linux-gnu
+            features: nlp
+            artifact_stem: airml-linux-aarch64
+            use_cross: true
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Rust
+      - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
+        with:
+          key: release-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Build
-        run: cargo build --release --target ${{ matrix.target }}
+      - name: Install cross (Linux arm64 only)
+        if: matrix.use_cross == true
+        run: cargo install cross --git https://github.com/cross-rs/cross
+
+      - name: Build release binary
+        run: |
+          if [ "${{ matrix.use_cross }}" = "true" ]; then
+            cross build --release --target ${{ matrix.target }} --features=${{ matrix.features }}
+          else
+            cargo build --release --target ${{ matrix.target }} --features=${{ matrix.features }}
+          fi
+
+      - name: Strip binary (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          strip target/${{ matrix.target }}/release/airml || true
+
+      - name: Strip binary (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          strip target/${{ matrix.target }}/release/airml || true
 
       - name: Package
         run: |
+          VERSION="${GITHUB_REF_NAME}"
+          ARCHIVE="${{ matrix.artifact_stem }}-${VERSION}.tar.gz"
           mkdir -p dist
-          cp target/${{ matrix.target }}/release/airml dist/
-          cd dist
-          tar -czvf ../${{ matrix.artifact }}.tar.gz airml
-          cd ..
+          cp target/${{ matrix.target }}/release/airml dist/airml
+          tar -C dist -czvf "${ARCHIVE}" airml
+          echo "ARCHIVE=${ARCHIVE}" >> "$GITHUB_ENV"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.artifact }}
-          path: ${{ matrix.artifact }}.tar.gz
+          name: ${{ matrix.artifact_stem }}
+          path: ${{ env.ARCHIVE }}
 
   release:
-    name: Create Release
+    name: Create GitHub Release
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download artifacts
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts
 
-      - name: Create Release
+      - name: Generate Homebrew formula with real SHAs
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME}"
+          # Strip leading 'v' for the formula version field.
+          VERSION_BARE="${VERSION#v}"
+
+          compute_sha() {
+            local stem="$1"
+            local archive
+            archive=$(find artifacts/"${stem}" -name "*.tar.gz" | head -1)
+            shasum -a 256 "${archive}" | awk '{print $1}'
+          }
+
+          SHA_MACOS_ARM64=$(compute_sha "airml-macos-aarch64")
+          SHA_MACOS_X86_64=$(compute_sha "airml-macos-x86_64")
+          SHA_LINUX_ARM64=$(compute_sha "airml-linux-aarch64")
+          SHA_LINUX_X86_64=$(compute_sha "airml-linux-x86_64")
+
+          sed \
+            -e "s|REPLACE_AT_RELEASE_TIME|${SHA_MACOS_ARM64}|1" \
+            -e "s|REPLACE_AT_RELEASE_TIME|${SHA_MACOS_X86_64}|1" \
+            -e "s|REPLACE_AT_RELEASE_TIME|${SHA_LINUX_ARM64}|1"  \
+            -e "s|REPLACE_AT_RELEASE_TIME|${SHA_LINUX_X86_64}|1" \
+            -e "s|version \"0\.2\.0\"|version \"${VERSION_BARE}\"|g" \
+            -e "s|/v0\.2\.0/|/${VERSION}/|g" \
+            Formula/airml.rb > Formula/airml-release.rb
+
+          echo "Generated Formula/airml-release.rb:"
+          cat Formula/airml-release.rb
+
+      - name: Create release and upload assets
         uses: softprops/action-gh-release@v1
         with:
-          files: artifacts/**/*.tar.gz
+          files: |
+            artifacts/**/*.tar.gz
+            Formula/airml-release.rb
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

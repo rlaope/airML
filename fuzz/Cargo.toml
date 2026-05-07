@@ -1,0 +1,19 @@
+[package]
+name = "airml-fuzz"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+airml-tune = { path = "../crates/airml-tune" }
+
+[[bin]]
+name = "graph_parser"
+path = "fuzz_targets/graph_parser.rs"
+test = false
+doc = false
+bench = false

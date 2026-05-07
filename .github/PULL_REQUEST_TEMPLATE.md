@@ -1,38 +1,31 @@
-## Description
+## Summary
 
-<!-- Brief description of what this PR does -->
+<!-- One paragraph: what does this PR change and why? -->
 
-## Type of Change
+## Type of change
 
-- [ ] Bug fix (non-breaking change that fixes an issue)
-- [ ] New feature (non-breaking change that adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] Documentation update
-- [ ] Refactoring (no functional changes)
+<!-- Check one or more, prefix the PR title accordingly: -->
 
-## Related Issues
-
-<!-- Link any related issues: Fixes #123 -->
-
-## Changes Made
-
-<!-- List the specific changes made -->
-
--
-
-## Testing
-
-<!-- Describe how you tested your changes -->
-
-- [ ] Unit tests pass (`cargo test`)
-- [ ] Clippy passes (`cargo clippy --all-features`)
-- [ ] Formatting passes (`cargo fmt --check`)
-- [ ] Manual testing done
+- [ ] `feat:` — new feature
+- [ ] `fix:` — bug fix
+- [ ] `perf:` — performance improvement
+- [ ] `refactor:` — internal restructuring (no behavior change)
+- [ ] `docs:` — documentation only
+- [ ] `test:` — test additions/changes
+- [ ] `ci:` — CI configuration
 
 ## Checklist
 
-- [ ] Code follows the project style guidelines
-- [ ] Self-review of code completed
-- [ ] Comments added for complex logic
-- [ ] Documentation updated (if needed)
-- [ ] No new warnings introduced
+- [ ] `cargo test --workspace --features=coreml,nlp` passes locally
+- [ ] `cargo clippy --workspace --all-targets --features=coreml,nlp -- -D warnings` passes
+- [ ] Public API changes are intentional and noted in this PR description
+- [ ] If the PR changes user-facing CLI behavior, the relevant `book/src/cli/*.md` page is updated
+- [ ] If the PR adds dependencies, the new license is MIT/Apache/BSD compatible
+
+## Breaking changes
+
+<!-- If this is a breaking change for the public API, describe migration path -->
+
+## Related issues
+
+<!-- "Closes #123" or "Refs #456" -->

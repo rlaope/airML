@@ -1,0 +1,13 @@
+# Default owner for everything (placeholder team — replace with real GitHub team)
+* @airml/maintainers
+
+# Per-area
+/crates/airml-core/        @airml/core-team
+/crates/airml-providers/   @airml/core-team
+/crates/airml-hub/         @airml/maintainers
+/crates/airml-tune/        @airml/maintainers
+/crates/airml-bench/       @airml/maintainers
+/.github/workflows/        @airml/maintainers
+/book/                     @airml/maintainers
+/docs/                     @airml/maintainers
+/deploy/                   @airml/maintainers

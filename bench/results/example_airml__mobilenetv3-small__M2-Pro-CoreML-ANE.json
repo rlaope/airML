@@ -1,0 +1,28 @@
+{
+  "schema_version": "1",
+  "runtime": "airml",
+  "runtime_version": "0.2.0",
+  "label": "M2-Pro/CoreML-ANE",
+  "model": "mobilenetv3-small",
+  "model_size_mb": 14.2,
+  "_note": "EXAMPLE DATA — replace with your own runs via 'make bench' or 'bash bench/run-all.sh'",
+  "host": {
+    "os": "macos",
+    "arch": "aarch64",
+    "cpu_brand": "Apple M2 Pro",
+    "ram_gb": 32
+  },
+  "metrics": {
+    "p50_ms": 2.1,
+    "p90_ms": 3.4,
+    "p95_ms": 4.0,
+    "p99_ms": 6.2,
+    "mean_ms": 2.3,
+    "stddev_ms": 0.5,
+    "min_ms": 1.8,
+    "max_ms": 8.1,
+    "throughput_inf_per_sec": 434.8,
+    "cold_start_ms": 38.0,
+    "warm_start_ms": 2.5
+  }
+}

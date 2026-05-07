@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <!--
+    airML Open Graph / Twitter Card — 1200x630.
+    Dark background. Logo centered. Tagline below.
+    Rasterize with: rsvg-convert -w 1200 -h 630 social-card.svg > social-card.png
+  -->
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#0a0a0a" />
+
+  <!-- Subtle grid lines for technical feel -->
+  <line x1="0" y1="314" x2="1200" y2="314" stroke="#1a1a1a" stroke-width="1" />
+  <line x1="600" y1="0" x2="600" y2="630" stroke="#1a1a1a" stroke-width="1" />
+
+  <!-- Accent bar at top -->
+  <rect x="0" y="0" width="1200" height="3" fill="#0a84ff" />
+
+  <!-- Chevron mark, centered, large -->
+  <g fill="#ffffff" transform="translate(480, 130)">
+    <!-- Left leg -->
+    <polygon points="8,160 38,160 100,28 70,28" />
+    <!-- Right leg -->
+    <polygon points="100,28 130,28 130,60 100,60" />
+    <!-- Top cap -->
+    <polygon points="70,28 100,28 100,60 84,108 46,108" />
+  </g>
+
+  <!-- "airML" wordmark, centered below mark -->
+  <text
+    x="600"
+    y="360"
+    text-anchor="middle"
+    font-family="Menlo, 'SF Mono', Consolas, monospace"
+    font-size="96"
+    font-weight="700"
+    fill="#ffffff"
+    letter-spacing="-3"
+  >airML</text>
+
+  <!-- Tagline -->
+  <text
+    x="600"
+    y="430"
+    text-anchor="middle"
+    font-family="Menlo, 'SF Mono', Consolas, monospace"
+    font-size="22"
+    fill="#888888"
+    letter-spacing="0"
+  >Run any ONNX model on Apple Silicon &#x2014; single binary. No Python.</text>
+
+  <!-- Bottom-right attribution -->
+  <text
+    x="1180"
+    y="610"
+    text-anchor="end"
+    font-family="Menlo, 'SF Mono', Consolas, monospace"
+    font-size="16"
+    fill="#444444"
+  >github.com/airml/airml</text>
+</svg>

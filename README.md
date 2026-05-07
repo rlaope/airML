@@ -1,29 +1,186 @@
-# airML
+<p align="center">
+  <img src="assets/logo-wide.svg" alt="airML" width="400">
+</p>
 
-A lightweight ML runtime that runs ONNX models without Python. Fast, portable, and efficient.
+<p align="center">
+  <em>The fastest way to run any ONNX model on Apple Silicon as a single binary.<br>
+  No Python, no Docker, no <code>pip install</code>.</em>
+</p>
 
-## Features
+**Documentation:** https://airml.github.io/airml
 
-- **Single Binary**: Deploy ML models with a single ~50MB binary
-- **Fast Cold Start**: 0.01-0.05s startup time (100x faster than Python)
-- **Apple Silicon Acceleration**: Native CoreML/Metal/Neural Engine support
-- **ONNX Support**: Run models exported from PyTorch, TensorFlow, and more
-- **Zero Dependencies**: No Python, no virtual environments, no package managers
-- **NLP Support**: Text tokenization and embedding generation
+airML packages ONNX Runtime and a curated set of models into a single native binary. You get sub-50ms cold starts, automatic Apple Neural Engine dispatch, and zero runtime dependencies. Install once, ship anywhere.
 
-## Installation
+[![CI](https://github.com/airml/airml/actions/workflows/ci.yml/badge.svg)](https://github.com/airml/airml/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/airml/airml/branch/master/graph/badge.svg)](https://codecov.io/gh/airml/airml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Rust 1.75+](https://img.shields.io/badge/Rust-1.75%2B-orange.svg)](https://www.rust-lang.org/)
+[![macOS arm64](https://img.shields.io/badge/platform-macOS%20arm64-lightgrey.svg)]()
+[![Linux arm64 / x86_64](https://img.shields.io/badge/platform-Linux%20arm64%20%2F%20x86__64-lightgrey.svg)]()
 
-### macOS (Apple Silicon) - Recommended
+<details>
+<summary>Architecture overview</summary>
+
+```mermaid
+graph LR
+    user[User CLI] --> airml
+    airml --> core[airml-core]
+    airml --> hub[airml-hub: model cache]
+    airml --> tune[airml-tune: backend dispatch]
+    core --> ort[ort 2.0]
+    ort -.-> coreml[CoreML / ANE / Metal]
+    ort -.-> cpu[CPU]
+```
+
+</details>
+
+<p align="center">
+  <img src="demo/airml-quickstart.gif" alt="airML demo" width="800">
+</p>
+
+## Why airML
+
+| You want to...                                | airML                   | candle | ort       | tract |
+|-----------------------------------------------|:-----------------------:|:------:|:---------:|:-----:|
+| Ship a 50MB binary that runs ONNX             | yes                     | no     | no        | yes   |
+| Use Apple Neural Engine without writing CoreML| yes                     | no     | manual    | no    |
+| Auto-pick the best compute units per model    | yes (`airml-tune`)      | no     | no        | no    |
+| Skip Python entirely                          | yes                     | yes    | yes (Rust)| yes   |
+| Train models                                  | no                      | yes    | no        | no    |
+| GPU on NVIDIA                                 | use `candle`            | yes    | yes       | no    |
+
+## Quickstart
+
+```bash
+# 1. Install
+cargo install --git https://github.com/rlaope/airML
+
+# 2. Install ONNX Runtime in one command
+airml install-runtime
+
+# 3. Pull a model and run inference
+airml pull bge-small-en
+airml run -m bge-small-en --input "Hello, world."
+```
+
+## Commands
+
+| Command                   | Purpose                                              |
+|---------------------------|------------------------------------------------------|
+| `airml install-runtime`   | Auto-download ONNX Runtime dylib (new in 0.2)        |
+| `airml pull <model>`      | Cache a model from registry / HuggingFace / URL (new in 0.2) |
+| `airml run`               | Inference on an input                                |
+| `airml embed`             | Text embedding (with `--features nlp`)               |
+| `airml info`              | Inspect a model                                      |
+| `airml bench`             | Quick latency benchmark                              |
+| `airml generate`          | LLM generation (stub -- coming in 0.3)              |
+| `airml serve`             | OpenAI-compatible embeddings HTTP API (v0.5, requires `--features nlp`) |
+| `airml system`            | Platform / provider check                            |
+
+See [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md) for logging and metrics.
+
+## HTTP daemon
+
+`airml serve` exposes an [OpenAI-compatible embeddings API](https://platform.openai.com/docs/api-reference/embeddings) so any OpenAI client library works without modification.
+
+```bash
+# Build with the nlp feature (required)
+cargo build --release --features nlp
+
+# Install ONNX Runtime and pull a model
+airml install-runtime
+airml pull bge-small-en
+
+# Start the server
+airml serve --bind 127.0.0.1:8080
+
+# In another terminal — embed text
+curl -s http://127.0.0.1:8080/v1/embeddings \
+  -H "Content-Type: application/json" \
+  -d '{"model":"bge-small-en","input":["Hello, world."]}' \
+  | jq '.data[0].embedding[:5]'
+```
+
+### Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/v1/embeddings` | Generate embeddings (OpenAI-compatible) |
+| `GET`  | `/v1/models` | List registry models |
+| `GET`  | `/v1/embeddings/info?model=<id>` | Cache status for a model |
+| `GET`  | `/healthz` | Health check — always `{"status":"ok"}` |
+
+### Options
+
+```
+--bind <host:port>           Bind address (default: 127.0.0.1:8080)
+--default-model <id>         Model used when request omits "model" field
+--auth-token <token>         Require Bearer token on /v1/* routes
+--max-request-bytes <bytes>  Request body size limit (default: 4 MiB)
+--cache-dir <path>           Override Hub cache directory
+```
+
+## Apple Silicon: the auto-tuner
+
+`airml-tune` profiles your model and picks the right CoreML compute units automatically:
+
+| Model class                      | Auto pick          | Reason                                         |
+|----------------------------------|--------------------|------------------------------------------------|
+| Vision (Conv-heavy)              | ANE only           | ANE excels at conv                             |
+| Text encoder, static shapes      | ANE only           | Best ANE throughput                            |
+| Text encoder, dynamic shapes     | All compute units  | Let CoreML decide per shape                    |
+| Image+Text dual                  | All compute units  | Mixed workload                                 |
+| Language model (KV cache)        | GPU only           | ANE struggles with autoregressive control flow |
+
+Override with `--provider {cpu,coreml,neural-engine,auto}`. Default is `auto`.
+
+## Models we love
+
+| ID                    | Source               | Use case             | Size    |
+|-----------------------|----------------------|----------------------|---------|
+| `bge-small-en`        | BAAI                 | Text embedding       | 133 MB  |
+| `all-minilm-l6-v2`   | sentence-transformers| Text embedding       | 90 MB   |
+| `clip-vit-b32`        | Xenova/CLIP          | Image+text           | 605 MB  |
+| `mobilenetv3-small`   | onnx/models          | Image classification | 14 MB   |
+| `whisper-tiny-encoder`| Xenova/Whisper       | Audio encoder        | 80 MB   |
+
+`airml pull --list` for the latest registry.
+
+## Performance
+
+> Reproducible benchmarks live under [`crates/airml-bench/`](crates/airml-bench/).
+> The numbers below come from `cargo bench -p airml-bench` on M2 Pro / macOS 14.
+
+| Provider            | Model       | Latency | Throughput  |
+|---------------------|-------------|---------|-------------|
+| CPU                 | ResNet50    | _       | _           |
+| CoreML (All)        | ResNet50    | _       | _           |
+| Neural Engine       | ResNet50    | _       | _           |
+
+> Help wanted! Run benchmarks on your hardware and PR results to `bench/results/`.
+
+Comparison to Python baseline (cold start, ~50MB binary vs ~2GB Python environment):
+
+| Metric         | airML      | Python (PyTorch) |
+|----------------|------------|------------------|
+| Binary size    | ~50 MB     | ~2 GB            |
+| Cold start     | 0.01-0.05s | 2-5s             |
+| Memory usage   | ~100 MB    | ~500 MB+         |
+
+## Install
+
+### macOS (Apple Silicon) -- recommended
 
 ```bash
 # 1. Download airml
 curl -L https://github.com/rlaope/airML/releases/latest/download/airml-macos-aarch64.tar.gz | tar xz
 sudo mv airml /usr/local/bin/
 
-# 2. Download ONNX Runtime (required)
-curl -L https://github.com/microsoft/onnxruntime/releases/download/v1.23.1/onnxruntime-osx-arm64-1.23.1.tgz | tar xz -C /usr/local/lib
+# 2. Install ONNX Runtime (new preferred path)
+airml install-runtime
 
-# 3. Set environment variable (add to ~/.zshrc for persistence)
+# Or manually:
+curl -L https://github.com/microsoft/onnxruntime/releases/download/v1.23.1/onnxruntime-osx-arm64-1.23.1.tgz | tar xz -C /usr/local/lib
 export ORT_DYLIB_PATH=/usr/local/lib/onnxruntime-osx-arm64-1.23.1/lib/libonnxruntime.dylib
 ```
 
@@ -47,7 +204,7 @@ curl -L https://github.com/microsoft/onnxruntime/releases/download/v1.23.1/onnxr
 export ORT_DYLIB_PATH=/usr/local/lib/onnxruntime-linux-x64-1.23.1/lib/libonnxruntime.so
 ```
 
-### From Source
+### From source
 
 ```bash
 git clone https://github.com/rlaope/airML.git
@@ -55,161 +212,13 @@ cd airML
 cargo build --release --features coreml,nlp
 ```
 
-### Verify Installation
+### Verify installation
 
 ```bash
 airml system
 ```
 
-## Quick Start
-
-### Image Classification
-
-```bash
-# Run classification on an image
-airml run -m resnet50.onnx -i cat.jpg -l imagenet_labels.txt
-
-# Output:
-# Top 5 predictions:
-# --------------------------------------------------
-#  281  95.23% ======================================== tabby
-#  282   3.12% === tiger cat
-#  285   0.89% = Egyptian cat
-```
-
-### Text Embeddings
-
-```bash
-# Generate text embeddings
-airml embed -m sentence-transformer.onnx -t tokenizer.json --text "Hello world"
-
-# Output:
-# {
-#   "text": "Hello world",
-#   "dimension": 384,
-#   "embedding": [0.123456, 0.234567, ...]
-# }
-```
-
-### Benchmarking
-
-```bash
-# Benchmark inference performance
-airml bench -m model.onnx -n 100 -p neural-engine
-
-# Output:
-# Mean latency:     12.34 ms
-# Throughput:       81.00 inferences/sec
-```
-
-### System Info
-
-```bash
-# Check available providers
-airml system
-
-# Output:
-# OS: macos
-# Architecture: aarch64
-# Apple Silicon: true
-# Available providers: cpu, coreml
-```
-
-## CLI Reference
-
-### `airml run`
-
-Run inference on an input image.
-
-```bash
-airml run --model <MODEL> --input <INPUT> [OPTIONS]
-
-Options:
-  -m, --model <MODEL>       Path to ONNX model file
-  -i, --input <INPUT>       Path to input file (image)
-  -l, --labels <LABELS>     Path to labels file
-  -k, --top-k <N>           Top predictions to show [default: 5]
-  -p, --provider <PROVIDER> Execution provider (auto, cpu, coreml, neural-engine)
-      --preprocess <PRESET> Preprocessing (imagenet, clip, yolo, none)
-      --raw                 Output raw tensor values
-```
-
-### `airml embed`
-
-Generate text embeddings (requires `nlp` feature).
-
-```bash
-airml embed --model <MODEL> --tokenizer <TOKENIZER> --text <TEXT> [OPTIONS]
-
-Options:
-  -m, --model <MODEL>          ONNX embedding model
-  -t, --tokenizer <TOKENIZER>  tokenizer.json file
-      --text <TEXT>            Text to embed
-      --max-length <N>         Max sequence length [default: 512]
-  -p, --provider <PROVIDER>    Execution provider
-      --output <FORMAT>        Output format (json, raw)
-      --normalize              L2 normalize embeddings
-```
-
-### `airml info`
-
-Display model information.
-
-```bash
-airml info --model <MODEL> [-v]
-```
-
-### `airml bench`
-
-Benchmark inference performance.
-
-```bash
-airml bench --model <MODEL> [OPTIONS]
-
-Options:
-  -n, --iterations <N>     Iterations [default: 100]
-  -w, --warmup <N>         Warmup iterations [default: 10]
-  -p, --provider <PROVIDER> Execution provider
-      --shape <SHAPE>      Input shape (e.g., "1,3,224,224")
-```
-
-### `airml system`
-
-Display system capabilities.
-
-## Execution Providers
-
-| Provider | Platform | Hardware | Flag |
-|----------|----------|----------|------|
-| CPU | All | Any CPU | (default) |
-| CoreML | macOS | Apple Silicon | `--features coreml` |
-| Neural Engine | macOS | M1/M2/M3 ANE | `--features coreml` |
-
-```bash
-# Build with specific providers
-cargo build --release                      # CPU only
-cargo build --release --features coreml    # + CoreML
-cargo build --release --features nlp       # + NLP
-cargo build --release --features coreml,nlp # All features
-```
-
-## Performance
-
-Benchmarked on Apple M2 with ResNet50:
-
-| Provider | Latency | Throughput |
-|----------|---------|------------|
-| CPU | ~50ms | ~20 inf/s |
-| CoreML (All) | ~15ms | ~65 inf/s |
-| Neural Engine | ~8ms | ~125 inf/s |
-
-| Metric | airML | Python (PyTorch) |
-|--------|-------|------------------|
-| Binary Size | ~50MB | ~2GB |
-| Cold Start | 0.01-0.05s | 2-5s |
-| Memory Usage | ~100MB | ~500MB+ |
-
-## Using as a Library
+## Using as a library
 
 ```rust
 use airml_core::{InferenceEngine, SessionConfig};
@@ -217,14 +226,11 @@ use airml_preprocess::ImagePreprocessor;
 use airml_providers::CoreMLProvider;
 
 fn main() -> anyhow::Result<()> {
-    // Configure with CoreML
     let providers = vec![CoreMLProvider::default().neural_engine_only().into_dispatch()];
     let config = SessionConfig::new().with_providers(providers);
 
-    // Load model
     let mut engine = InferenceEngine::from_file_with_config("model.onnx", config)?;
 
-    // Preprocess and run
     let input = ImagePreprocessor::imagenet().load_and_process("image.jpg")?;
     let outputs = engine.run(input.into_dyn())?;
 
@@ -232,7 +238,7 @@ fn main() -> anyhow::Result<()> {
 }
 ```
 
-## Embedding Models in Binary
+Embed a model directly into your binary:
 
 ```rust
 use airml_embed::EmbeddedModel;
@@ -241,45 +247,43 @@ static MODEL: &[u8] = include_bytes!("model.onnx");
 
 fn main() -> anyhow::Result<()> {
     let engine = EmbeddedModel::new(MODEL).into_engine()?;
-    // Use engine...
+    // use engine...
     Ok(())
 }
 ```
 
-## Project Structure
+## Deploy
 
-```
-airML/
-├── crates/
-│   ├── airml-core/        # Inference engine (ONNX Runtime wrapper)
-│   ├── airml-preprocess/  # Image/text preprocessing
-│   ├── airml-providers/   # Execution providers (CPU, CoreML)
-│   └── airml-embed/       # Model embedding utilities
-├── src/                   # CLI binary
-│   ├── main.rs
-│   ├── cli.rs             # Argument parsing
-│   └── commands/          # Command implementations
-├── docs/                  # Documentation
-│   ├── ARCHITECTURE.md    # Internal architecture
-│   ├── TUTORIAL.md        # Step-by-step tutorials
-│   └── API.md             # API reference
-└── models/                # Test models (gitignored)
+Ship airML in production with Docker, systemd, or Homebrew. See the full
+[Deployment Guide](docs/DEPLOYMENT.md) for Docker Compose, AWS Lambda ARM,
+and platform notes.
+
+**One-line Docker example:**
+
+```bash
+docker run --rm -p 8080:8080 airml/airml:0.2 serve --bind 0.0.0.0:8080
 ```
 
-## Documentation
+## Anti-goals (what we don't do)
 
-- [Architecture](docs/ARCHITECTURE.md) - Internal design and data flow
-- [Tutorial](docs/TUTORIAL.md) - Step-by-step guides
-- [API Reference](docs/API.md) - Complete API documentation
+- We don't compete with `candle` on CUDA -- use `candle`.
+- We don't train models -- use `burn`.
+- We don't ship a Python binding (this is the point).
+- We don't host an iOS/Android SDK -- server/desktop CLI focused.
+- We don't expand the registry beyond ~20 curated models.
 
-## License
+## Roadmap
 
-MIT License - see [LICENSE](LICENSE) for details.
+See [ROADMAP.md](ROADMAP.md). v0.2 is shipping the auto-tuner + model registry; v0.3 lands LLM generation with KV cache.
 
-## Maintainer
+## Examples
 
-- [@rlaope](https://github.com/rlaope) - piyrw9754@gmail.com
+See [examples/](examples/). Each is < 100 LOC and runs with `cargo run --example <name>`.
 
 ## Contributing
 
-See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for guidelines.
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## License
+
+MIT -- see [LICENSE](LICENSE) for details.

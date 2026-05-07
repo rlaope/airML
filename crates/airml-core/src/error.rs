@@ -63,3 +63,69 @@ impl From<ort::Error> for AirMLError {
 
 /// Result type alias for airML operations
 pub type Result<T> = std::result::Result<T, AirMLError>;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_error_display_messages() {
+        let e = AirMLError::ModelNotFound("path/to/model.onnx".to_string());
+        let msg = e.to_string();
+        assert!(!msg.is_empty());
+        assert!(msg.contains("path/to/model.onnx"));
+
+        let e = AirMLError::ModelLoadError("bad bytes".to_string());
+        let msg = e.to_string();
+        assert!(msg.contains("bad bytes"));
+
+        let e = AirMLError::InvalidModelFormat("not onnx".to_string());
+        let msg = e.to_string();
+        assert!(msg.contains("not onnx"));
+
+        let e = AirMLError::ShapeMismatch {
+            expected: vec![1, 3, 224, 224],
+            actual: vec![1, 3, 256, 256],
+        };
+        let msg = e.to_string();
+        assert!(msg.contains("224"));
+        assert!(msg.contains("256"));
+
+        let e = AirMLError::TypeMismatch {
+            expected: "f32".to_string(),
+            actual: "i64".to_string(),
+        };
+        let msg = e.to_string();
+        assert!(msg.contains("f32"));
+        assert!(msg.contains("i64"));
+
+        let e = AirMLError::InferenceError("kernel panic".to_string());
+        let msg = e.to_string();
+        assert!(msg.contains("kernel panic"));
+
+        let e = AirMLError::ProviderNotAvailable("CoreML".to_string());
+        let msg = e.to_string();
+        assert!(msg.contains("CoreML"));
+
+        let e = AirMLError::ImageError("corrupt jpeg".to_string());
+        let msg = e.to_string();
+        assert!(msg.contains("corrupt jpeg"));
+
+        let e = AirMLError::OrtError("ort internal".to_string());
+        let msg = e.to_string();
+        assert!(msg.contains("ort internal"));
+
+        let e = AirMLError::ConfigError("missing field".to_string());
+        let msg = e.to_string();
+        assert!(msg.contains("missing field"));
+    }
+
+    #[test]
+    fn test_error_from_io_error_conversion() {
+        let io_err = std::io::Error::new(std::io::ErrorKind::NotFound, "file missing");
+        let air_err: AirMLError = io_err.into();
+        let msg = air_err.to_string();
+        assert!(!msg.is_empty());
+        assert!(msg.contains("file missing"));
+    }
+}

@@ -11,104 +11,125 @@ env:
   RUST_BACKTRACE: 1
 
 jobs:
-  check:
-    name: Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache cargo
-        uses: Swatinem/rust-cache@v2
-
-      - name: Check
-        run: cargo check --features nlp
-
+  # ── Matrix: check + clippy + test across OS × feature combinations ─────────
   test:
-    name: Test
+    name: test (${{ matrix.os }}, features=${{ matrix.features || 'default' }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-22.04, macos-14]
+        features: ["", "coreml", "coreml,nlp"]
+        exclude:
+          # coreml is Apple-only; skip those cells on Ubuntu
+          - os: ubuntu-22.04
+            features: "coreml"
+          - os: ubuntu-22.04
+            features: "coreml,nlp"
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache cargo
-        uses: Swatinem/rust-cache@v2
-
-      - name: Run tests (Linux)
-        if: runner.os == 'Linux'
-        run: cargo test --features nlp
-
-      - name: Run tests (macOS)
-        if: runner.os == 'macOS'
-        run: cargo test --features coreml,nlp
-
-  clippy:
-    name: Clippy
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Rust
+      - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
-
-      - name: Clippy
-        run: cargo clippy --features nlp -- -D warnings
-
-  build-macos:
-    name: Build macOS
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-apple-darwin
+          key: ${{ matrix.os }}-${{ matrix.features }}-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Cache cargo
-        uses: Swatinem/rust-cache@v2
-
-      - name: Build (x86_64)
-        run: cargo build --release --features coreml,nlp
-
-      - name: Build (aarch64)
-        run: cargo build --release --target aarch64-apple-darwin --features coreml,nlp
-        if: runner.arch == 'ARM64'
-
-      - name: Check binary size
+      - name: cargo check
         run: |
-          ls -lh target/release/airml
-          echo "Binary size: $(du -h target/release/airml | cut -f1)"
+          if [ -z "${{ matrix.features }}" ]; then
+            cargo check --workspace --all-targets
+          else
+            cargo check --workspace --all-targets --features=${{ matrix.features }}
+          fi
 
-  build-linux:
-    name: Build Linux
-    runs-on: ubuntu-latest
+      - name: cargo clippy
+        run: |
+          if [ -z "${{ matrix.features }}" ]; then
+            cargo clippy --workspace --all-targets -- -D warnings
+          else
+            cargo clippy --workspace --all-targets --features=${{ matrix.features }} -- -D warnings
+          fi
+
+      - name: cargo test
+        run: |
+          if [ -z "${{ matrix.features }}" ]; then
+            cargo test --workspace
+          else
+            cargo test --workspace --features=${{ matrix.features }}
+          fi
+
+  # ── Bench compile: ensure criterion harness compiles (macOS only) ──────────
+  bench-compile:
+    name: bench compile (macos-14)
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Rust
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: macos-14-bench-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Compile benchmarks (no-run)
+        run: cargo bench --no-run -p airml-bench
+
+  # ── Binary size monitor (macOS arm64 only) ────────────────────────────────
+  binary-size:
+    name: binary size monitor (macos-14 arm64)
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: macos-14-release-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Build release (coreml)
+        run: cargo build --workspace --release --features=coreml
+
+      - name: Check binary size
+        run: |
+          SIZE_BYTES=$(wc -c < target/release/airml | tr -d ' ')
+          SIZE_MB=$(awk "BEGIN {printf \"%.2f\", $SIZE_BYTES/1048576}")
+          echo "Binary size: ${SIZE_MB} MB (${SIZE_BYTES} bytes)"
+          if [ "$SIZE_BYTES" -gt $((10 * 1024 * 1024)) ]; then
+            echo "ERROR: binary exceeds 10 MB limit (${SIZE_MB} MB)"
+            exit 1
+          fi
+
+  # ── End-to-end integration tests with real ORT (macOS arm64 only) ─────────
+  integration:
+    name: integration (macos-14)
+    runs-on: macos-14
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
 
-      - name: Build
-        run: cargo build --release --features nlp
-
-      - name: Check binary size
+      - name: Install ONNX Runtime
         run: |
-          ls -lh target/release/airml
-          echo "Binary size: $(du -h target/release/airml | cut -f1)"
+          curl -L https://github.com/microsoft/onnxruntime/releases/download/v1.20.0/onnxruntime-osx-arm64-1.20.0.tgz \
+            -o /tmp/ort.tgz
+          tar -xzf /tmp/ort.tgz -C /tmp/
+          echo "ORT_DYLIB_PATH=/tmp/onnxruntime-osx-arm64-1.20.0/lib/libonnxruntime.1.20.0.dylib" >> $GITHUB_ENV
+
+      - name: Run e2e tests
+        run: cargo test --test integration_e2e --test integration_hub --test integration_tune --features=coreml,nlp

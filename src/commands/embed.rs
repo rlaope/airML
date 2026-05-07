@@ -63,6 +63,7 @@ pub fn execute(args: &EmbedArgs, verbose: bool) -> Result<()> {
     // We need to handle this based on model inputs
     let model_inputs = engine.inputs();
 
+    let t0 = std::time::Instant::now();
     let outputs = if model_inputs.len() >= 2 {
         // Model expects multiple inputs (input_ids, attention_mask)
         engine
@@ -77,6 +78,14 @@ pub fn execute(args: &EmbedArgs, verbose: bool) -> Result<()> {
             .run(input_ids.into_dyn().mapv(|x| x as f32))
             .context("Inference failed")?
     };
+    let elapsed = t0.elapsed();
+
+    if let Some(c) = crate::metrics::INFERENCE_COUNT.get() {
+        c.inc();
+    }
+    if let Some(h) = crate::metrics::INFERENCE_LATENCY.get() {
+        h.observe(elapsed.as_secs_f64());
+    }
 
     // Get embeddings from output
     let embeddings = extract_embeddings(&outputs)?;

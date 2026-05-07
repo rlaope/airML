@@ -1,0 +1,146 @@
+name: Benchmarks
+
+on:
+  push:
+    branches: [master, main]
+    paths:
+      - "bench/**"
+      - "crates/airml-bench/**"
+  workflow_dispatch:
+    inputs:
+      model:
+        description: "Model to benchmark (must be pullable via airml pull)"
+        required: false
+        default: "mobilenetv3-small"
+      iterations:
+        description: "Timed iterations per runtime"
+        required: false
+        default: "50"
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+  # Use mobilenetv3-small for CI — it's 14 MB and runs quickly (< 10 min total).
+  MODEL_NAME: ${{ github.event.inputs.model || 'mobilenetv3-small' }}
+  ITERATIONS: ${{ github.event.inputs.iterations || '50' }}
+  WARMUP: "5"
+
+jobs:
+  bench:
+    name: Benchmark (${{ github.event.inputs.model || 'mobilenetv3-small' }})
+    # macOS-14 is Apple Silicon (M1) — required for valid CoreML / ANE numbers.
+    runs-on: macos-14
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo (workspace)
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: macos-14-bench-${{ hashFiles('**/Cargo.lock') }}
+          workspaces: |
+            . -> target
+            bench/runtimes/ort_baseline -> target
+            bench/runtimes/tract_baseline -> target
+
+      # ── Install ONNX Runtime dylib ───────────────────────────────────────
+      - name: Install ONNX Runtime
+        run: |
+          cargo build --release --features=coreml
+          ./target/release/airml install-runtime
+        env:
+          ORT_STRATEGY: download
+
+      # ── Pull model ────────────────────────────────────────────────────────
+      - name: Pull model (${{ env.MODEL_NAME }})
+        run: |
+          ./target/release/airml pull "${{ env.MODEL_NAME }}"
+
+      # ── Build baseline runtimes ───────────────────────────────────────────
+      - name: Build ORT baseline
+        run: |
+          cd bench/runtimes/ort_baseline
+          cargo build --release --features coreml
+
+      - name: Build tract baseline
+        run: |
+          cd bench/runtimes/tract_baseline
+          cargo build --release
+
+      # ── Run all benchmarks ────────────────────────────────────────────────
+      - name: Run airml benchmark
+        run: |
+          MODEL_PATH="$HOME/.airml/models/${{ env.MODEL_NAME }}.onnx"
+          AIRML_BENCH_LABEL="macos-14/CoreML-ANE" \
+          AIRML_BENCH_OUTPUT_DIR="bench/results" \
+          ./target/release/airml bench "$MODEL_PATH" \
+            --iterations "${{ env.ITERATIONS }}" \
+            --warmup "${{ env.WARMUP }}" \
+            --provider auto || true
+
+      - name: Run ORT baseline
+        run: |
+          MODEL_PATH="$HOME/.airml/models/${{ env.MODEL_NAME }}.onnx"
+          MODEL_PATH="$MODEL_PATH" \
+          bench/runtimes/ort_baseline/target/release/airml-bench-ort \
+            --label "macos-14/CoreML" \
+            --iterations "${{ env.ITERATIONS }}" \
+            --warmup "${{ env.WARMUP }}" \
+            > "bench/results/ort__${{ env.MODEL_NAME }}__macos-14-CoreML.json" || true
+
+      - name: Run tract baseline
+        run: |
+          MODEL_PATH="$HOME/.airml/models/${{ env.MODEL_NAME }}.onnx"
+          MODEL_PATH="$MODEL_PATH" \
+          bench/runtimes/tract_baseline/target/release/airml-bench-tract \
+            --label "macos-14/CPU" \
+            --iterations "${{ env.ITERATIONS }}" \
+            --warmup "${{ env.WARMUP }}" \
+            > "bench/results/tract__${{ env.MODEL_NAME }}__macos-14-CPU.json" || true
+
+      - name: Run Python baseline
+        run: |
+          pip3 install --quiet onnxruntime numpy
+          MODEL_PATH="$HOME/.airml/models/${{ env.MODEL_NAME }}.onnx"
+          python3 bench/runtimes/python_baseline/bench.py \
+            --model-path "$MODEL_PATH" \
+            --label "macos-14/CPU" \
+            --iterations "${{ env.ITERATIONS }}" \
+            --warmup "${{ env.WARMUP }}" \
+            > "bench/results/python__${{ env.MODEL_NAME }}__macos-14-CPU.json" || true
+
+      # ── Generate site ─────────────────────────────────────────────────────
+      - name: Generate benchmark site
+        run: |
+          python3 bench/site/build.py \
+            --results-dir bench/results \
+            --output-dir bench/site/dist
+
+      # ── Upload site as artifact ───────────────────────────────────────────
+      - name: Upload benchmark site artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-site-${{ github.sha }}
+          path: bench/site/dist/
+          retention-days: 30
+
+      - name: Upload raw results artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-results-${{ github.sha }}
+          path: bench/results/
+          retention-days: 30
+
+      # ── Deploy to gh-pages ────────────────────────────────────────────────
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: bench/site/dist
+          publish_branch: gh-pages
+          destination_dir: bench
+          commit_message: "bench: update benchmark site [${{ env.MODEL_NAME }}] ${{ github.sha }}"

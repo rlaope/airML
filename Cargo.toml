@@ -1,21 +1,28 @@
 [workspace]
 resolver = "2"
+exclude = ["fuzz", "bench/runtimes/ort_baseline", "bench/runtimes/tract_baseline"]
 members = [
     "crates/airml-core",
     "crates/airml-preprocess",
     "crates/airml-providers",
     "crates/airml-embed",
+    "crates/airml-bench",
+    "crates/airml-tune",
+    "crates/airml-hub",
 ]
 
 [package]
 name = "airml"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
-description = "Lightweight ML runtime - Run ML models without Python"
+description = "Run any ONNX model on Apple Silicon as a single binary. No Python, no Docker, no pip install."
 license = "MIT"
 repository = "https://github.com/airml/airml"
-keywords = ["machine-learning", "onnx", "inference", "rust"]
+homepage = "https://github.com/airml/airml"
+documentation = "https://docs.rs/airml"
+keywords = ["machine-learning", "onnx", "inference", "apple-silicon", "coreml"]
 categories = ["science", "command-line-utilities"]
+rust-version = "1.80"
 
 [dependencies]
 # Workspace crates
@@ -23,6 +30,8 @@ airml-core = { path = "crates/airml-core" }
 airml-preprocess = { path = "crates/airml-preprocess" }
 airml-providers = { path = "crates/airml-providers" }
 airml-embed = { path = "crates/airml-embed" }
+airml-tune = { path = "crates/airml-tune" }
+airml-hub = { path = "crates/airml-hub" }
 
 # CLI
 clap = { version = "4.5", features = ["derive"] }
@@ -30,13 +39,35 @@ clap = { version = "4.5", features = ["derive"] }
 # Error handling
 anyhow = "1.0"
 
-# Async (for future use)
-tokio = { version = "1.43", features = ["rt", "macros"], optional = true }
+# Tensor/image — also used by examples/
+ndarray = { workspace = true }
+image = { workspace = true }
+
+# HTTP / hashing for install-runtime + model pull
+ureq = { version = "2.10", features = ["tls"] }
+sha2 = "0.10"
+dirs = "5.0"
+
+# Archive extraction for install-runtime
+flate2 = "1.0"
+tar = "0.4"
+
+# Async runtime — required by `airml serve`
+tokio = { version = "1.43", features = ["full"] }
+
+# HTTP daemon (airml serve)
+axum = { version = "0.7", features = ["macros"] }
+tower-http = { version = "0.5", features = ["trace", "cors"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json", "fmt"] }
+prometheus = { version = "0.13", default-features = false }
 
 [features]
 default = ["cpu"]
 cpu = ["airml-providers/cpu"]
-coreml = ["airml-providers/coreml"]
+coreml = ["airml-providers/coreml", "airml-tune/coreml"]
 nlp = ["airml-preprocess/nlp"]
 
 [profile.release]
@@ -46,12 +77,20 @@ panic = "abort"
 strip = true
 opt-level = 3
 
+[dev-dependencies]
+tempfile = "3"
+sha2 = "0.10"
+hex = "0.4"
+airml-core = { path = "crates/airml-core" }
+airml-hub = { path = "crates/airml-hub" }
+airml-tune = { path = "crates/airml-tune" }
+
 [profile.dev]
 opt-level = 1
 
 [workspace.dependencies]
 # ONNX Runtime
-ort = { version = "2.0.0-rc.11", default-features = false }
+ort = { version = "=2.0.0-rc.11", default-features = false }
 
 # Tensor/Array
 ndarray = "0.16"
@@ -65,3 +104,16 @@ nshare = "0.10"
 thiserror = "2.0"
 anyhow = "1.0"
 
+# HTTP / IO / hashing (shared by hub + install)
+ureq = { version = "2.10", features = ["tls"] }
+sha2 = "0.10"
+dirs = "5.0"
+hex = "0.4"
+
+# Benchmarks
+criterion = { version = "0.5", features = ["html_reports"] }
+
+# Internal core (used by downstream crates that need engine APIs)
+airml-core = { path = "crates/airml-core", version = "0.1.0" }
+airml-providers = { path = "crates/airml-providers", version = "0.1.0" }
+airml-embed = { path = "crates/airml-embed", version = "0.1.0" }

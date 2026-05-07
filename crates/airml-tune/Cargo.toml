@@ -1,0 +1,29 @@
+[package]
+name = "airml-tune"
+version = "0.1.0"
+edition = "2021"
+description = "Automatic backend dispatcher and CoreML compute-unit oracle for airML"
+license = "MIT"
+repository = "https://github.com/airml/airml"
+homepage = "https://github.com/airml/airml"
+documentation = "https://docs.rs/airml-tune"
+readme = "README.md"
+keywords = ["onnx", "auto-tune", "coreml", "backend"]
+categories = ["science", "hardware-support"]
+rust-version = "1.80"
+
+[dependencies]
+airml-core = { workspace = true }
+airml-providers = { path = "../airml-providers", version = "0.1.0" }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tracing = "0.1"
+
+[features]
+default = []
+coreml = ["airml-providers/coreml"]
+
+[dev-dependencies]
+proptest = "1.5"

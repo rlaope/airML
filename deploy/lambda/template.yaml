@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: airML Lambda function (ARM, OpenAI-compatible embeddings)
+
+Parameters:
+  DefaultModel:
+    Type: String
+    Default: bge-small-en
+    Description: Registry id of the default embedding model
+  AuthToken:
+    Type: String
+    Default: ''
+    NoEcho: true
+    Description: Optional bearer token for /v1/embeddings
+
+Resources:
+  AirmlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: airml-embeddings
+      Runtime: provided.al2023
+      Handler: bootstrap
+      Architectures: [arm64]
+      MemorySize: 1024
+      Timeout: 30
+      EphemeralStorage:
+        Size: 2048
+      CodeUri: dist/airml-function.zip
+      Layers:
+        - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:airml-ort:1
+        - !Sub arn:aws:lambda:${AWS::Region}:753240598075:layer:LambdaAdapterLayerArm64:24
+      Environment:
+        Variables:
+          AWS_LAMBDA_EXEC_WRAPPER: /opt/bootstrap
+          PORT: "8080"
+          ORT_DYLIB_PATH: /opt/lib/libonnxruntime.so
+          AIRML_DEFAULT_MODEL: !Ref DefaultModel
+          AIRML_CACHE_DIR: /tmp/airml
+          AIRML_AUTH_TOKEN: !Ref AuthToken
+          RUST_LOG: info
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            Method: POST
+            Path: /v1/embeddings
+
+Outputs:
+  ApiUrl:
+    Description: HTTP API endpoint
+    Value: !Sub https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com

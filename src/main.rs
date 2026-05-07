@@ -11,14 +11,32 @@
 
 mod cli;
 mod commands;
+pub mod metrics;
 
 use anyhow::Result;
 use clap::Parser;
 
 use cli::{Cli, Commands};
 
+fn init_tracing(format: &str, level: &str) {
+    let env_filter = tracing_subscriber::EnvFilter::try_from_default_env()
+        .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new(level));
+    let builder = tracing_subscriber::fmt().with_env_filter(env_filter);
+    if format == "json" {
+        builder.json().init();
+    } else {
+        builder.init();
+    }
+}
+
 fn main() -> Result<()> {
     let cli = Cli::parse();
+
+    init_tracing(&cli.log_format, &cli.log_level);
+
+    if let Err(e) = metrics::init() {
+        tracing::warn!(error = %e, "failed to initialize Prometheus metrics; continuing without metrics");
+    }
 
     match &cli.command {
         Commands::Run(args) => commands::run(args, cli.verbose),
@@ -27,5 +45,9 @@ fn main() -> Result<()> {
         Commands::System => commands::system(),
         #[cfg(feature = "nlp")]
         Commands::Embed(args) => commands::embed(args, cli.verbose),
+        Commands::InstallRuntime(args) => commands::install_runtime(args),
+        Commands::Pull(args) => commands::pull(args),
+        Commands::Generate(args) => commands::generate(args),
+        Commands::Serve(args) => commands::serve(args),
     }
 }

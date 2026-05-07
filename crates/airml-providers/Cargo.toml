@@ -2,8 +2,15 @@
 name = "airml-providers"
 version = "0.1.0"
 edition = "2021"
-description = "Execution providers for airML"
+description = "Execution provider configuration and auto-selection for airML (CPU, CoreML)"
 license = "MIT"
+repository = "https://github.com/airml/airml"
+homepage = "https://github.com/airml/airml"
+documentation = "https://docs.rs/airml-providers"
+readme = "README.md"
+keywords = ["onnx", "coreml", "apple-silicon", "execution-provider"]
+categories = ["science", "hardware-support"]
+rust-version = "1.80"
 
 [dependencies]
 ort = { workspace = true, features = ["load-dynamic"] }

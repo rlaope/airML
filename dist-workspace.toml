@@ -1,0 +1,28 @@
+# This is a cargo-dist v0.22 config template. Currently NOT active —
+# release.yml does the cross-compile manually. To switch to cargo-dist:
+#   cargo install cargo-dist --version 0.22.1
+#   cargo dist init   # imports this config
+#   cargo dist generate  # writes .github/workflows/release.yml (may overwrite)
+
+[workspace]
+members = ["cargo:."]
+
+[dist]
+cargo-dist-version = "0.22.1"
+ci = "github"
+installers = ["shell", "homebrew"]
+targets = [
+    "aarch64-apple-darwin",
+    "x86_64-apple-darwin",
+    "aarch64-unknown-linux-gnu",
+    "x86_64-unknown-linux-gnu",
+]
+unix-archive = ".tar.gz"
+windows-archive = ".tar.gz"
+include = ["LICENSE", "README.md"]
+
+[dist.github-custom-runners]
+aarch64-apple-darwin = "macos-14"
+x86_64-apple-darwin = "macos-14"
+aarch64-unknown-linux-gnu = "ubuntu-22.04"
+x86_64-unknown-linux-gnu = "ubuntu-22.04"

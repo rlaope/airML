@@ -3,9 +3,10 @@
 //! Executes model inference on input data.
 
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use airml_core::{ndarray, InferenceEngine, SessionConfig};
+use airml_hub::{Fetcher, ModelUri};
 use airml_preprocess::ImagePreprocessor;
 use airml_providers::auto_select_providers;
 use anyhow::{Context, Result};
@@ -14,16 +15,23 @@ use crate::cli::RunArgs;
 
 /// Execute the run command
 pub fn execute(args: &RunArgs, verbose: bool) -> Result<()> {
+    // Resolve model: may be a local path, registry ID, or hf:// URI.
+    let uri = ModelUri::parse(&args.model)
+        .with_context(|| format!("Failed to parse model URI: {}", args.model))?;
+    let model_path: PathBuf = Fetcher::new()
+        .resolve_to_path(&uri)
+        .with_context(|| format!("Failed to resolve model: {}", args.model))?;
+
     if verbose {
-        println!("Loading model: {}", args.model.display());
+        println!("Loading model: {}", model_path.display());
     }
 
     // Configure session with providers
-    let providers = select_providers(&args.provider)?;
+    let providers = select_providers(&args.provider, &model_path, verbose)?;
     let config = SessionConfig::new().with_providers(providers);
 
     // Load model
-    let engine = InferenceEngine::from_file_with_config(&args.model, config)
+    let engine = InferenceEngine::from_file_with_config(&model_path, config)
         .context("Failed to load model")?;
 
     if verbose {
@@ -53,9 +61,18 @@ pub fn execute(args: &RunArgs, verbose: bool) -> Result<()> {
     }
 
     let mut engine = engine;
+    let t0 = std::time::Instant::now();
     let outputs = engine
         .run(input_tensor.into_dyn())
         .context("Inference failed")?;
+    let elapsed = t0.elapsed();
+
+    if let Some(c) = crate::metrics::INFERENCE_COUNT.get() {
+        c.inc();
+    }
+    if let Some(h) = crate::metrics::INFERENCE_LATENCY.get() {
+        h.observe(elapsed.as_secs_f64());
+    }
 
     // Process outputs
     if args.raw {
@@ -67,9 +84,74 @@ pub fn execute(args: &RunArgs, verbose: bool) -> Result<()> {
     Ok(())
 }
 
-fn select_providers(provider_name: &str) -> Result<Vec<airml_providers::ExecutionProviderDispatch>> {
+fn select_providers(
+    provider_name: &str,
+    model_path: &std::path::Path,
+    #[allow(unused_variables)] verbose: bool,
+) -> Result<Vec<airml_providers::ExecutionProviderDispatch>> {
     match provider_name {
-        "auto" => Ok(auto_select_providers()),
+        "auto" => {
+            #[cfg(feature = "coreml")]
+            {
+                let oracle = airml_tune::BackendOracle::new();
+
+                // Prefer graph-based classification for higher accuracy.
+                // Fall back to metadata heuristics if graph parsing fails
+                // (e.g. corrupt file, unsupported opset).
+                let rec = match oracle.recommend_for_path(model_path) {
+                    Ok(graph_rec) => {
+                        // Patch with session metadata (family + dynamic shapes)
+                        // for a more complete recommendation.
+                        let probe_config =
+                            SessionConfig::new().with_providers(auto_select_providers());
+                        if let Ok(probe) =
+                            InferenceEngine::from_file_with_config(model_path, probe_config)
+                        {
+                            let mut profile =
+                                oracle.profile_from_metadata(probe.metadata());
+                            if let Ok(hist) = airml_tune::histogram_from_path(model_path) {
+                                profile.dominant_op_class = hist.dominant_class();
+                            }
+                            oracle.recommend(&profile)
+                        } else {
+                            graph_rec
+                        }
+                    }
+                    Err(err) => {
+                        eprintln!(
+                            "[airml-tune] graph parse failed, falling back to metadata heuristics: {err}"
+                        );
+                        let probe_config =
+                            SessionConfig::new().with_providers(auto_select_providers());
+                        if let Ok(probe) =
+                            InferenceEngine::from_file_with_config(model_path, probe_config)
+                        {
+                            oracle.recommend_for_metadata(probe.metadata())
+                        } else {
+                            return Ok(auto_select_providers());
+                        }
+                    }
+                };
+
+                let providers = airml_tune::dispatch::recommendation_to_providers(&rec);
+                eprintln!(
+                    "[airml-tune] selected backend: {:?} (model: {})",
+                    rec,
+                    model_path.file_name().unwrap_or_default().to_string_lossy()
+                );
+                return Ok(providers);
+            }
+            #[cfg(not(feature = "coreml"))]
+            {
+                let _ = model_path;
+                if verbose {
+                    eprintln!("[airml-tune] using CPU auto-selection (coreml feature not enabled)");
+                }
+                return Ok(auto_select_providers());
+            }
+            #[allow(unreachable_code)]
+            Ok(auto_select_providers())
+        }
         "cpu" => Ok(vec![airml_providers::CpuProvider::default().into_dispatch()]),
         #[cfg(feature = "coreml")]
         "coreml" => Ok(vec![airml_providers::CoreMLProvider::default().into_dispatch()]),

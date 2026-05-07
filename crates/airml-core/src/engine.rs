@@ -42,8 +42,8 @@ pub struct TensorInfo {
 
 /// Main inference engine for running ONNX models
 pub struct InferenceEngine {
-    session: Session,
-    metadata: ModelMetadata,
+    pub(crate) session: Session,
+    pub(crate) metadata: ModelMetadata,
 }
 
 impl InferenceEngine {
@@ -53,6 +53,7 @@ impl InferenceEngine {
     }
 
     /// Load a model from a file path with custom configuration
+    #[tracing::instrument(level = "info", skip(config), fields(path = %path.as_ref().display()))]
     pub fn from_file_with_config<P: AsRef<Path>>(path: P, config: SessionConfig) -> Result<Self> {
         let path = path.as_ref();
 
@@ -60,8 +61,10 @@ impl InferenceEngine {
             return Err(AirMLError::ModelNotFound(path.display().to_string()));
         }
 
+        let t0 = std::time::Instant::now();
         let session = Self::build_session_from_file(path, &config)?;
         let metadata = Self::extract_metadata(&session)?;
+        tracing::debug!(elapsed_ms = t0.elapsed().as_millis() as u64, "model loaded");
 
         Ok(Self { session, metadata })
     }
@@ -220,6 +223,7 @@ impl InferenceEngine {
     }
 
     /// Run inference with named inputs
+    #[tracing::instrument(skip(self, inputs), fields(num_inputs))]
     pub fn run_named(&mut self, inputs: Vec<(&str, ArrayD<f32>)>) -> Result<Vec<ArrayD<f32>>> {
         // Create input tensors
         let mut ort_inputs: Vec<(String, Tensor<f32>)> = Vec::new();
@@ -230,6 +234,8 @@ impl InferenceEngine {
                 .map_err(|e| AirMLError::InferenceError(e.to_string()))?;
             ort_inputs.push((name.to_string(), tensor));
         }
+
+        tracing::Span::current().record("num_inputs", ort_inputs.len() as u64);
 
         // Build input references as (name, value) pairs
         let input_values: Vec<(std::borrow::Cow<'_, str>, ort::session::SessionInputValue<'_>)> =
@@ -242,6 +248,8 @@ impl InferenceEngine {
                     )
                 })
                 .collect();
+
+        let t0 = std::time::Instant::now();
 
         // Run inference
         let outputs = self
@@ -263,6 +271,8 @@ impl InferenceEngine {
 
             results.push(array);
         }
+
+        tracing::debug!(elapsed_us = t0.elapsed().as_micros() as u64, "run_named completed");
 
         Ok(results)
     }
@@ -295,5 +305,24 @@ mod tests {
 
         assert_eq!(config.intra_threads, 4);
         assert_eq!(config.inter_threads, 2);
+    }
+
+    #[test]
+    fn test_from_file_returns_model_not_found_for_missing_path() {
+        let result = InferenceEngine::from_file("/nonexistent/airml_test_xyz.onnx");
+        assert!(matches!(result, Err(AirMLError::ModelNotFound(_))));
+    }
+
+    #[test]
+    fn test_tensor_info_clone_preserves_fields() {
+        let info = TensorInfo {
+            name: "input".to_string(),
+            shape: vec![1, 3, 224, 224],
+            dtype: "Float32".to_string(),
+        };
+        let cloned = info.clone();
+        assert_eq!(cloned.name, info.name);
+        assert_eq!(cloned.shape, info.shape);
+        assert_eq!(cloned.dtype, info.dtype);
     }
 }

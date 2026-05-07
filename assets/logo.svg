@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!--
+    airML logo — chevron mark + wordmark
+    Single color via currentColor; works on both dark and light backgrounds.
+  -->
+
+  <!-- Chevron mark: upward-pointing, representing acceleration -->
+  <g fill="currentColor">
+    <!-- Left leg of chevron -->
+    <polygon points="20,130 42,130 70,75 48,75" />
+    <!-- Right leg of chevron -->
+    <polygon points="70,75 92,75 92,98 70,98" />
+  </g>
+
+  <!-- "airML" wordmark — baseline aligned with chevron center -->
+  <text
+    x="102"
+    y="118"
+    font-family="Menlo, 'SF Mono', Consolas, monospace"
+    font-size="48"
+    font-weight="700"
+    fill="currentColor"
+    letter-spacing="-1"
+  >airML</text>
+</svg>

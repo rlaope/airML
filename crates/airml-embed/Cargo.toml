@@ -2,9 +2,16 @@
 name = "airml-embed"
 version = "0.1.0"
 edition = "2021"
-description = "Model embedding support for airML"
+description = "Compile-time ONNX model embedding into Rust binaries via include_bytes!"
 license = "MIT"
+repository = "https://github.com/airml/airml"
+homepage = "https://github.com/airml/airml"
+documentation = "https://docs.rs/airml-embed"
+readme = "README.md"
+keywords = ["onnx", "embedded", "include-bytes", "binary"]
+categories = ["science", "embedded"]
+rust-version = "1.80"
 
 [dependencies]
-airml-core = { path = "../airml-core" }
+airml-core = { path = "../airml-core", version = "0.1.0" }
 thiserror = { workspace = true }

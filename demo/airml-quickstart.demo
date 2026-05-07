@@ -1,0 +1,32 @@
+# demo/airml-quickstart.demo
+# Recorded with vhs (https://github.com/charmbracelet/vhs)
+# Run: vhs demo/airml-quickstart.demo
+
+Output demo/airml-quickstart.gif
+
+Set FontSize 18
+Set Width 1200
+Set Height 700
+Set Theme "Dracula"
+Set TypingSpeed 50ms
+
+Type "# airML quickstart" Enter
+Sleep 800ms
+
+Type "airml install-runtime" Enter
+Sleep 2s
+
+Type "airml pull bge-small-en" Enter
+Sleep 3s
+
+Type "airml info -m bge-small-en" Enter
+Sleep 2s
+
+Type "airml embed -m bge-small-en --text 'Hello, world.' --output json" Enter
+Sleep 2s
+
+Type "airml bench -m bge-small-en -n 100" Enter
+Sleep 5s
+
+Type "# done in under 60 seconds." Enter
+Sleep 2s

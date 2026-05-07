@@ -17,6 +17,13 @@ models/*.onnx
 models/*.pt
 models/*.bin
 !models/.gitkeep
+!models/synthetic-identity.onnx
+
+# OMC state (local-only)
+/.omc/
+
+# Stray build artifacts
+/libnull.rlib
 
 # Test data
 *.jpg

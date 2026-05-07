@@ -1,0 +1,113 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://benchmarks.airml.dev/schema/v1/bench-report.json",
+  "title": "airML Benchmark Report",
+  "description": "Schema version 1 for airML cross-runtime benchmark JSON reports.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "runtime",
+    "runtime_version",
+    "label",
+    "model",
+    "model_size_mb",
+    "host",
+    "metrics"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1",
+      "description": "Schema version. Always '1' for this generation of reports."
+    },
+    "runtime": {
+      "type": "string",
+      "enum": ["airml", "ort", "tract", "python", "candle"],
+      "description": "The inference runtime that produced this report."
+    },
+    "runtime_version": {
+      "type": "string",
+      "description": "Version string of the runtime (e.g. '0.2.0' for airml, '1.23.1' for onnxruntime)."
+    },
+    "label": {
+      "type": "string",
+      "description": "Human-readable label for this run, e.g. 'M2-Pro/CoreML-ANE'."
+    },
+    "model": {
+      "type": "string",
+      "description": "Model identifier, e.g. 'bge-small-en' or 'mobilenetv3-small'."
+    },
+    "model_size_mb": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Size of the ONNX model file in megabytes."
+    },
+    "host": {
+      "type": "object",
+      "required": ["os", "arch", "cpu_brand", "ram_gb"],
+      "additionalProperties": false,
+      "properties": {
+        "os": {
+          "type": "string",
+          "description": "Operating system name, e.g. 'macos', 'linux', 'windows'."
+        },
+        "arch": {
+          "type": "string",
+          "description": "CPU architecture, e.g. 'aarch64', 'x86_64'."
+        },
+        "cpu_brand": {
+          "type": "string",
+          "description": "CPU brand string from sysinfo, e.g. 'Apple M2 Pro'."
+        },
+        "ram_gb": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total system RAM in gigabytes."
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "required": [
+        "p50_ms",
+        "p90_ms",
+        "p95_ms",
+        "p99_ms",
+        "mean_ms",
+        "stddev_ms",
+        "min_ms",
+        "max_ms",
+        "throughput_inf_per_sec",
+        "cold_start_ms",
+        "warm_start_ms"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "p50_ms": { "type": "number", "minimum": 0, "description": "50th-percentile latency (ms)." },
+        "p90_ms": { "type": "number", "minimum": 0, "description": "90th-percentile latency (ms)." },
+        "p95_ms": { "type": "number", "minimum": 0, "description": "95th-percentile latency (ms)." },
+        "p99_ms": { "type": "number", "minimum": 0, "description": "99th-percentile latency (ms)." },
+        "mean_ms": { "type": "number", "minimum": 0, "description": "Arithmetic mean latency (ms)." },
+        "stddev_ms": { "type": "number", "minimum": 0, "description": "Sample standard deviation (ms)." },
+        "min_ms": { "type": "number", "minimum": 0, "description": "Minimum observed latency (ms)." },
+        "max_ms": { "type": "number", "minimum": 0, "description": "Maximum observed latency (ms)." },
+        "throughput_inf_per_sec": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Steady-state throughput in inferences per second."
+        },
+        "cold_start_ms": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Time from engine loaded to first inference complete (ms)."
+        },
+        "warm_start_ms": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Average latency over the first warmup runs (ms)."
+        }
+      }
+    }
+  }
+}

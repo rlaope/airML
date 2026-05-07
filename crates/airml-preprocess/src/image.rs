@@ -271,4 +271,85 @@ mod tests {
         assert_eq!(preprocessor.width, 640);
         assert_eq!(preprocessor.height, 640);
     }
+
+    #[test]
+    fn test_imagenet_normalization_constants() {
+        let p = ImagePreprocessor::imagenet();
+        // Verify exact ImageNet mean/std values
+        assert!((p.mean[0] - 0.485).abs() < 1e-6);
+        assert!((p.mean[1] - 0.456).abs() < 1e-6);
+        assert!((p.mean[2] - 0.406).abs() < 1e-6);
+        assert!((p.std[0] - 0.229).abs() < 1e-6);
+        assert!((p.std[1] - 0.224).abs() < 1e-6);
+        assert!((p.std[2] - 0.225).abs() < 1e-6);
+        assert!(p.rgb);
+    }
+
+    #[test]
+    #[allow(clippy::excessive_precision)]
+    fn test_clip_normalization_constants() {
+        let p = ImagePreprocessor::clip();
+        assert!((p.mean[0] - 0.48145466).abs() < 1e-7);
+        assert!((p.mean[1] - 0.4578275).abs() < 1e-7);
+        assert!((p.mean[2] - 0.40821073).abs() < 1e-7);
+        assert!((p.std[0] - 0.26862954).abs() < 1e-7);
+        assert!((p.std[1] - 0.26130258).abs() < 1e-7);
+        assert!((p.std[2] - 0.27577711).abs() < 1e-7);
+        assert!(matches!(p.resize_mode, ResizeMode::CenterCrop));
+    }
+
+    #[test]
+    fn test_yolo_normalization_is_identity() {
+        let p = ImagePreprocessor::yolo(640);
+        // YOLO normalizes to [0,1] with no shift: mean=0, std=1
+        assert_eq!(p.mean, [0.0, 0.0, 0.0]);
+        assert_eq!(p.std, [1.0, 1.0, 1.0]);
+        assert!(matches!(p.resize_mode, ResizeMode::Pad { fill: [114, 114, 114] }));
+    }
+
+    #[test]
+    fn test_custom_preprocessor_stores_values() {
+        let mean = [0.1, 0.2, 0.3];
+        let std = [0.4, 0.5, 0.6];
+        let p = ImagePreprocessor::custom(320, 240, mean, std);
+        assert_eq!(p.width, 320);
+        assert_eq!(p.height, 240);
+        assert_eq!(p.mean, mean);
+        assert_eq!(p.std, std);
+        assert!(p.rgb);
+    }
+
+    #[test]
+    fn test_with_rgb_false_sets_bgr() {
+        let p = ImagePreprocessor::imagenet().with_rgb(false);
+        assert!(!p.rgb);
+    }
+
+    #[test]
+    fn test_process_constant_white_image_imagenet() {
+        // A 1x1 white image: pixel value 255 → (1.0 - mean) / std for each channel.
+        let img = image::DynamicImage::ImageRgb8(
+            image::RgbImage::from_pixel(1, 1, image::Rgb([255u8, 255u8, 255u8])),
+        );
+        let p = ImagePreprocessor::custom(1, 1, [0.5, 0.5, 0.5], [0.5, 0.5, 0.5]);
+        let tensor = p.process(&img).expect("process failed");
+        // shape: [1, 3, 1, 1]
+        assert_eq!(tensor.shape(), &[1, 3, 1, 1]);
+        // (255/255 - 0.5) / 0.5 = 1.0
+        assert!((tensor[[0, 0, 0, 0]] - 1.0).abs() < 1e-5);
+        assert!((tensor[[0, 1, 0, 0]] - 1.0).abs() < 1e-5);
+        assert!((tensor[[0, 2, 0, 0]] - 1.0).abs() < 1e-5);
+    }
+
+    #[test]
+    fn test_process_constant_black_image_imagenet() {
+        // A 1x1 black image: pixel value 0 → (0.0 - mean) / std = -mean/std
+        let img = image::DynamicImage::ImageRgb8(
+            image::RgbImage::from_pixel(1, 1, image::Rgb([0u8, 0u8, 0u8])),
+        );
+        let p = ImagePreprocessor::custom(1, 1, [0.5, 0.5, 0.5], [0.5, 0.5, 0.5]);
+        let tensor = p.process(&img).expect("process failed");
+        // (0/255 - 0.5) / 0.5 = -1.0
+        assert!((tensor[[0, 0, 0, 0]] - (-1.0)).abs() < 1e-5);
+    }
 }

@@ -4,10 +4,14 @@
 
 mod engine;
 mod error;
+pub mod io_binding;
 mod session;
 
-pub use engine::{InferenceEngine, ModelMetadata};
+pub use engine::{InferenceEngine, ModelMetadata, TensorInfo};
 pub use error::{AirMLError, Result};
+pub use io_binding::{
+    infer_layer_count_from_metadata, logits_to_array, BoundSession, KvDtype, KvShape,
+};
 pub use session::SessionConfig;
 
 pub use ndarray;

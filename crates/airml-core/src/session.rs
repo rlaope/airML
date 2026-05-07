@@ -89,3 +89,49 @@ impl SessionConfig {
         self
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use ort::session::builder::GraphOptimizationLevel;
+
+    #[test]
+    fn test_session_config_default_values() {
+        let config = SessionConfig::default();
+        assert_eq!(config.intra_threads, 0);
+        assert_eq!(config.inter_threads, 0);
+        assert!(config.providers.is_empty());
+        assert!(matches!(config.optimization_level, OptimizationLevel::Extended));
+    }
+
+    #[test]
+    fn test_optimization_level_into_ort() {
+        let disabled: GraphOptimizationLevel = OptimizationLevel::Disabled.into();
+        let basic: GraphOptimizationLevel = OptimizationLevel::Basic.into();
+        let extended: GraphOptimizationLevel = OptimizationLevel::Extended.into();
+        let all: GraphOptimizationLevel = OptimizationLevel::All.into();
+
+        assert!(matches!(disabled, GraphOptimizationLevel::Disable));
+        assert!(matches!(basic, GraphOptimizationLevel::Level1));
+        assert!(matches!(extended, GraphOptimizationLevel::Level2));
+        assert!(matches!(all, GraphOptimizationLevel::Level3));
+    }
+
+    #[test]
+    fn test_session_config_with_providers_replaces() {
+        let config = SessionConfig::new().with_providers(vec![]);
+        assert!(config.providers.is_empty());
+    }
+
+    #[test]
+    fn test_session_config_chained_builder() {
+        let config = SessionConfig::new()
+            .with_intra_threads(4)
+            .with_inter_threads(2)
+            .with_optimization_level(OptimizationLevel::Basic);
+
+        assert_eq!(config.intra_threads, 4);
+        assert_eq!(config.inter_threads, 2);
+        assert!(matches!(config.optimization_level, OptimizationLevel::Basic));
+    }
+}

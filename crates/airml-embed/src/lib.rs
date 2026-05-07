@@ -80,8 +80,8 @@ impl<'a> EmbeddedModel<'a> {
 #[macro_export]
 macro_rules! embed_model {
     ($name:ident, $path:literal) => {
-        static $name: $crate::EmbeddedModel<'static> =
-            $crate::EmbeddedModel::new(include_bytes!($path));
+        static $name: std::sync::LazyLock<$crate::EmbeddedModel<'static>> =
+            std::sync::LazyLock::new(|| $crate::EmbeddedModel::new(include_bytes!($path)));
     };
 }
 
@@ -94,5 +94,42 @@ mod tests {
         let bytes = &[0u8; 100];
         let model = EmbeddedModel::new(bytes);
         assert_eq!(model.size(), 100);
+    }
+
+    #[test]
+    fn test_embedded_model_bytes_returns_input_slice() {
+        let bytes: &[u8] = &[1u8, 2, 3, 4, 5];
+        let model = EmbeddedModel::new(bytes);
+        assert_eq!(model.bytes(), bytes);
+    }
+
+    #[test]
+    fn test_embedded_model_with_config_stores_config() {
+        let bytes: &[u8] = &[0u8; 10];
+        let config = SessionConfig::new().with_intra_threads(8);
+        let model = EmbeddedModel::with_config(bytes, config);
+        // size should still reflect the original bytes
+        assert_eq!(model.size(), 10);
+        assert_eq!(model.bytes(), bytes);
+    }
+
+    #[test]
+    fn test_embedded_model_chained_config_overrides() {
+        let bytes: &[u8] = &[0u8; 20];
+        let first_config = SessionConfig::new().with_intra_threads(2);
+        let second_config = SessionConfig::new().with_intra_threads(8).with_inter_threads(4);
+        let model = EmbeddedModel::with_config(bytes, first_config)
+            .config(second_config);
+        // The final config should be the second one; size/bytes unchanged
+        assert_eq!(model.size(), 20);
+        assert_eq!(model.bytes(), bytes);
+    }
+
+    #[test]
+    fn test_embedded_model_size_zero_for_empty_bytes() {
+        let bytes: &[u8] = &[];
+        let model = EmbeddedModel::new(bytes);
+        assert_eq!(model.size(), 0);
+        assert_eq!(model.bytes(), bytes);
     }
 }
