@@ -90,10 +90,10 @@ opt-level = 1
 
 [workspace.dependencies]
 # ONNX Runtime
-ort = { version = "=2.0.0-rc.11", default-features = false }
+ort = { version = "=2.0.0-rc.12", default-features = false }
 
 # Tensor/Array
-ndarray = "0.16"
+ndarray = "0.17"
 half = "2.4"
 
 # Image processing
